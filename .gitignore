@@ -1,0 +1,19 @@
+# Deno
+.deno
+deno.lock
+
+# Environment variables
+.env
+.env.local
+
+# Node compatibility
+node_modules/
+package-lock.json
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
