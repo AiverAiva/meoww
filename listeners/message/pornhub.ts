@@ -5,11 +5,35 @@ import {
   IS_COMPONENTS_V2,
 } from "../../utils/components_v2.ts";
 
-// Regular expression to match Pornhub video links
-const PH_REGEX =
+// Regular expressions
+const PH_VIDEO_REGEX =
   /https?:\/\/(?:[a-zA-Z0-9-]+\.)?pornhub\.com\/view_video\.php\?viewkey=([a-zA-Z0-9]+)/;
+const PH_MODEL_REGEX =
+  /https?:\/\/(?:[a-zA-Z0-9-]+\.)?pornhub\.com\/model\/([a-zA-Z0-9-_]+)/;
 
-async function fetchVideoInfo(viewKey: string) {
+interface PHVideoInfo {
+  type: "video";
+  title: string;
+  author: string;
+  thumbnail: string;
+  views: string;
+  uploadDate: string;
+  url: string;
+  description: string;
+}
+
+interface PHModelInfo {
+  type: "model";
+  name: string;
+  subscribers: string;
+  views: string;
+  avatar?: string;
+  url: string;
+}
+
+type PHInfo = PHVideoInfo | PHModelInfo;
+
+async function fetchVideoInfo(viewKey: string): Promise<PHVideoInfo | null> {
   try {
     const res = await fetch(
       `https://www.pornhub.com/view_video.php?viewkey=${viewKey}`,
@@ -33,6 +57,7 @@ async function fetchVideoInfo(viewKey: string) {
       .replaceAll("&period;", ".");
 
     return {
+      type: "video",
       title: title,
       author: jsonLd.author,
       thumbnail: Array.isArray(jsonLd.thumbnailUrl)
@@ -48,10 +73,43 @@ async function fetchVideoInfo(viewKey: string) {
       url: jsonLd.contentUrl ||
         `https://www.pornhub.com/view_video.php?viewkey=${viewKey}`,
       description: jsonLd.description,
-      duration: jsonLd.duration,
     };
   } catch (error) {
     logger.error("Failed to fetch PH video info: {error}", { error });
+    return null;
+  }
+}
+
+async function fetchModelInfo(username: string): Promise<PHModelInfo | null> {
+  try {
+    const url = `https://www.pornhub.com/model/${username}`;
+    const res = await fetch(url);
+    const text = await res.text();
+
+    const name = text.match(
+      /<span[^>]*?class="[^"]*?js-profile-header-title[^"]*?"[^>]*?>(.*?)<\/span>/s,
+    )?.[1]?.trim();
+    const subscribers = text.match(
+      /<span class="[^"]*?bold[^"]*?">([\d\.KkMm]+)<\/span>\s*<span>Subscribers<\/span>/s,
+    )?.[1];
+    const avatar = text.match(/<img[^>]*?id="getAvatar"[^>]*?src="(.*?)"/)?.[1];
+    // optional: rank, views, etc.
+    const views = text.match(
+      /<span>Video Views:<\/span>\s*<span[^>]*?>([\d,KkMm\.]+)/i,
+    )?.[1];
+
+    if (!name) return null;
+
+    return {
+      type: "model",
+      name,
+      subscribers: subscribers || "Unknown",
+      views: views || "Unknown",
+      avatar,
+      url,
+    };
+  } catch (error) {
+    logger.error("Failed to fetch PH model info: {error}", { error });
     return null;
   }
 }
@@ -63,20 +121,87 @@ export const pornhubListener: MessageListener = {
     const message = rawMessage as any;
     if (message.isBot) return false;
     const content = message.content ?? "";
-    return PH_REGEX.test(content);
+    return PH_VIDEO_REGEX.test(content) || PH_MODEL_REGEX.test(content);
   },
   execute: async (bot, rawMessage) => {
     // deno-lint-ignore no-explicit-any
     const message = rawMessage as any;
-    const match = message.content.match(PH_REGEX);
-    if (!match) return;
+    const content = message.content;
 
-    const viewKey = match[1];
-    const info = await fetchVideoInfo(viewKey);
+    let info: PHInfo | null = null;
+
+    // Check for Video
+    const videoMatch = content.match(PH_VIDEO_REGEX);
+    if (videoMatch) {
+      const viewKey = videoMatch[1];
+      info = await fetchVideoInfo(viewKey);
+    }
+
+    // Check for Model
+    if (!info) {
+      const modelMatch = content.match(PH_MODEL_REGEX);
+      if (modelMatch) {
+        const username = modelMatch[1];
+        info = await fetchModelInfo(username);
+      }
+    }
 
     if (!info) return;
 
-    logger.info("Pornhub listener found video: {title}", { title: info.title });
+    if (info.type === "video") {
+      logger.info("Pornhub listener found video: {title}", {
+        title: info.title,
+      });
+    } else {
+      logger.info("Pornhub listener found model: {name}", { name: info.name });
+    }
+
+    // Build Components
+    // deno-lint-ignore no-explicit-any
+    let components: any[] = [];
+
+    if (info.type === "video") {
+      components = [
+        {
+          type: ComponentV2Type.MediaGallery,
+          items: [
+            {
+              media: {
+                url: info.thumbnail,
+              },
+              spoiler: true,
+            },
+          ],
+        },
+        {
+          type: ComponentV2Type.TextDisplay,
+          content:
+            `### [${info.title}](${info.url})\n**${info.views} Views** • ${info.uploadDate}\nby **${info.author}**`,
+        },
+      ];
+    } else {
+      // Model Preview
+      components = [
+        ...(info.avatar
+          ? [{
+            type: ComponentV2Type.MediaGallery,
+            items: [
+              {
+                media: {
+                  url: info.avatar,
+                },
+                spoiler: false,
+              },
+            ],
+          }]
+          : []),
+        {
+          type: ComponentV2Type.TextDisplay,
+          content:
+            `### [${info.name}](${info.url})\n**${info.subscribers} Subscribers** • **${info.views} Video Views**`,
+        },
+      ];
+    }
 
     await bot.helpers.sendMessage(message.channelId, {
       messageReference: {
@@ -92,25 +217,8 @@ export const pornhubListener: MessageListener = {
       components: [
         {
           type: ComponentV2Type.Container,
-          components: [
-            {
-              type: ComponentV2Type.MediaGallery,
-              items: [
-                {
-                  media: {
-                    url: info.thumbnail,
-                  },
-                  spoiler: true,
-                },
-              ],
-              // deno-lint-ignore no-explicit-any
-            } as any,
-            {
-              type: ComponentV2Type.TextDisplay,
-              content:
-                `### [${info.title}](${info.url})\n**${info.views} Views** • ${info.uploadDate}\nby **${info.author}**`,
-            },
-          ],
+          accent_color: 0xFFA31A, // Pornhub Orange
+          components: components,
         },
       ] as unknown as import("@discordeno/bot").ActionRow[],
     });
