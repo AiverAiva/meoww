@@ -1,5 +1,6 @@
 import { ComponentV2Type } from "../components_v2.ts";
 import { logger } from "../logger.ts";
+import { decodeHtmlEntities } from "../html_utils.ts";
 
 // Regular expressions
 export const PH_VIDEO_REGEX =
@@ -45,12 +46,7 @@ async function fetchVideoInfo(
 
     const jsonLd = JSON.parse(jsonLdMatch[1]);
 
-    const title = jsonLd.name
-      .replaceAll("&apos;", "'")
-      .replaceAll("&quot;", '"')
-      .replaceAll("&comma;", ",")
-      .replaceAll("&amp;", "&")
-      .replaceAll("&period;", ".");
+    const title = decodeHtmlEntities(jsonLd.name);
 
     return {
       info: {
@@ -86,9 +82,13 @@ async function fetchModelInfo(
     const res = await fetch(url);
     const text = await res.text();
 
-    const name = text.match(
+    const rawName = text.match(
       /<span[^>]*?class="[^"]*?js-profile-header-title[^"]*?"[^>]*?>(.*?)<\/span>/s,
     )?.[1]?.trim();
+
+    if (!rawName) return { error: "Model not found or profile is private" };
+
+    const name = decodeHtmlEntities(rawName);
     const subscribers = text.match(
       /<span class="[^"]*?bold[^"]*?">([\d\.KkMm]+)<\/span>\s*<span>Subscribers<\/span>/s,
     )?.[1];
@@ -96,8 +96,6 @@ async function fetchModelInfo(
     const views = text.match(
       /<span>Video Views:<\/span>\s*<span[^>]*?>([\d,KkMm\.]+)/i,
     )?.[1];
-
-    if (!name) return { error: "Model not found or profile is private" };
 
     return {
       info: {

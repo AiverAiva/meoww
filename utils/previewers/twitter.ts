@@ -1,5 +1,6 @@
 import { ComponentV2Type } from "../components_v2.ts";
 import { logger } from "../logger.ts";
+import { decodeHtmlEntities } from "../html_utils.ts";
 
 // Regular expressions to match X/Twitter links
 export const X_REGEX =
@@ -71,10 +72,13 @@ export async function getTwitterPreview(content: string) {
       }
     });
 
+    // Decode HTML entities
+    const decodedText = decodeHtmlEntities(tweet.text);
+
     // Truncate text if too long
-    const truncatedText = tweet.text.length > 200
-      ? tweet.text.substring(0, 197) + "..."
-      : tweet.text;
+    const truncatedText = decodedText.length > 200
+      ? decodedText.substring(0, 197) + "..."
+      : decodedText;
 
     const statsText =
       `❤️ **${tweet.likes}**  🔁 **${tweet.retweets}**  💬 **${tweet.replies}**  👁️ **${
