@@ -32,12 +32,23 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
 
     const data = await res.json();
 
+    let imageUrls: string[] = data.image_proxy_urls ||
+      [`https://pixiv.cat/${artworkId}.jpg`];
+
+    // Handle ugoira / animations: if there's an animation URL, it's often followed by a static thumbnail.
+    // We only want the animation.
+    const animationUrl = imageUrls.find((url) =>
+      url.includes("/ugoira/") || url.endsWith(".mp4") || url.endsWith(".gif")
+    );
+    if (animationUrl) {
+      imageUrls = [animationUrl];
+    }
+
     const info: PixivInfo = {
       title: data.title || "Untitled",
       author: data.author_name || "Unknown Artist",
       authorId: data.author_id || "",
-      imageUrls: data.image_proxy_urls ||
-        [`https://pixiv.cat/${artworkId}.jpg`],
+      imageUrls,
       url: url,
       description: data.description || "",
       tags: data.tags || [],
@@ -56,7 +67,15 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
       .trim()
       .substring(0, 200);
 
-    // Build a flat list of components. mod.ts will handle grouping them into Sections.
+    // Format tags with each tag in its own backticks block as requested.
+    const tagBlock = info.tags
+      .map((t) => {
+        const clean = t.replace(/\s+/g, "");
+        const withHash = clean.startsWith("#") ? clean : `#${clean}`;
+        return `\`${withHash}\``;
+      })
+      .join(" ");
+
     // deno-lint-ignore no-explicit-any
     const components: any[] = [
       {
@@ -82,7 +101,7 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
         : []),
       {
         type: ComponentV2Type.TextDisplay,
-        content: `🏷️ ${info.tags.slice(0, 5).map((t) => `\`${t}\``).join(" ")}`,
+        content: `🏷️ ${tagBlock}`.substring(0, 1000), // Larger limit for tags
       },
     ];
 
@@ -94,8 +113,15 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
           {
             type: ComponentV2Type.Button,
             style: 2, // Secondary
+            label: "⏪",
+            custom_id: `pixiv_p_${artworkId}_f`, // f = first
+            disabled: safePageIndex <= 0,
+          },
+          {
+            type: ComponentV2Type.Button,
+            style: 2, // Secondary
             label: "⬅️",
-            custom_id: `pixiv_p_${artworkId}_${safePageIndex - 1}`,
+            custom_id: `pixiv_p_${artworkId}_v_${safePageIndex - 1}`, // v = prev
             disabled: safePageIndex <= 0,
           },
           {
@@ -109,7 +135,14 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
             type: ComponentV2Type.Button,
             style: 2, // Secondary
             label: "➡️",
-            custom_id: `pixiv_p_${artworkId}_${safePageIndex + 1}`,
+            custom_id: `pixiv_p_${artworkId}_n_${safePageIndex + 1}`, // n = next
+            disabled: safePageIndex >= pageCount - 1,
+          },
+          {
+            type: ComponentV2Type.Button,
+            style: 2, // Secondary
+            label: "⏩",
+            custom_id: `pixiv_p_${artworkId}_l`, // l = last
             disabled: safePageIndex >= pageCount - 1,
           },
         ],
@@ -122,7 +155,6 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
     };
   } catch (error) {
     logger.error("Failed to fetch Pixiv info: {error}", { error });
-    // Attempt extreme fallback using pixiv.cat
     return {
       color: 0x0096FA,
       components: [

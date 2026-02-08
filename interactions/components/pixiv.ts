@@ -19,7 +19,17 @@ export async function handlePixivPagination(
 
   const parts = customId.split("_");
   const artworkId = parts[2];
-  const pageIndex = parseInt(parts[3], 10);
+  const type = parts[3]; // f, v, n, l
+
+  let pageIndex = 0;
+  if (type === "f") {
+    pageIndex = 0;
+  } else if (type === "l") {
+    pageIndex = 999; // Handled by clamping in getPixivPreview
+  } else {
+    // For 'v' (prev) and 'n' (next), the index is in parts[4]
+    pageIndex = parseInt(parts[4], 10);
+  }
 
   const preview = await getPixivPreview(
     `https://www.pixiv.net/artworks/${artworkId}`,
