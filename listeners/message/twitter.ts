@@ -33,7 +33,9 @@ interface TweetInfo {
   created_at: string;
 }
 
-async function fetchTweetInfo(tweetId: string): Promise<TweetInfo | null> {
+async function fetchTweetInfo(
+  tweetId: string,
+): Promise<{ info?: TweetInfo; error?: string }> {
   try {
     const res = await fetch(`https://api.fxtwitter.com/status/${tweetId}`);
     const data = await res.json();
@@ -43,7 +45,7 @@ async function fetchTweetInfo(tweetId: string): Promise<TweetInfo | null> {
         code: data.code,
         message: data.message,
       });
-      return null;
+      return { error: data.message || "Unknown error" };
     }
 
     const tweet = data.tweet;
@@ -59,25 +61,27 @@ async function fetchTweetInfo(tweetId: string): Promise<TweetInfo | null> {
     // But FxTwitter usually puts everything in media.all
 
     return {
-      url: tweet.url,
-      text: tweet.text,
-      author: {
-        name: tweet.author.name,
-        screen_name: tweet.author.screen_name,
-        avatar_url: tweet.author.avatar_url,
+      info: {
+        url: tweet.url,
+        text: tweet.text,
+        author: {
+          name: tweet.author.name,
+          screen_name: tweet.author.screen_name,
+          avatar_url: tweet.author.avatar_url,
+        },
+        media: media,
+        stats: {
+          replies: tweet.replies,
+          retweets: tweet.retweets,
+          likes: tweet.likes,
+          views: tweet.views,
+        },
+        created_at: new Date(tweet.created_at).toLocaleString(),
       },
-      media: media,
-      stats: {
-        replies: tweet.replies,
-        retweets: tweet.retweets,
-        likes: tweet.likes,
-        views: tweet.views,
-      },
-      created_at: new Date(tweet.created_at).toLocaleString(),
     };
   } catch (error) {
     logger.error("Failed to fetch tweet info: {error}", { error });
-    return null;
+    return { error: "Failed to fetch tweet info" };
   }
 }
 
@@ -102,9 +106,37 @@ export const twitterListener: MessageListener = {
 
     if (!tweetId) return;
 
-    const info = await fetchTweetInfo(tweetId);
+    const result = await fetchTweetInfo(tweetId);
 
-    if (!info) return;
+    if (result.error || !result.info) {
+      await bot.helpers.sendMessage(message.channelId, {
+        messageReference: {
+          messageId: message.id,
+          channelId: message.channelId,
+          guildId: message.guildId,
+          failIfNotExists: false,
+        },
+        allowedMentions: { repliedUser: false },
+        flags: IS_COMPONENTS_V2,
+        components: [
+          {
+            type: ComponentV2Type.Container,
+            accent_color: 0xFF0000, // Red for error
+            components: [
+              {
+                type: ComponentV2Type.TextDisplay,
+                content: `❌ **Error**\n${
+                  result.error || "Could not fetch Tweet."
+                }`,
+              },
+            ],
+          },
+        ] as unknown as import("@discordeno/bot").ActionRow[],
+      });
+      return;
+    }
+
+    const info = result.info;
 
     logger.info("Twitter listener found tweet: {id}", { id: tweetId });
 

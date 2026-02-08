@@ -33,7 +33,9 @@ interface PHModelInfo {
 
 type PHInfo = PHVideoInfo | PHModelInfo;
 
-async function fetchVideoInfo(viewKey: string): Promise<PHVideoInfo | null> {
+async function fetchVideoInfo(
+  viewKey: string,
+): Promise<{ info?: PHVideoInfo; error?: string }> {
   try {
     const res = await fetch(
       `https://www.pornhub.com/view_video.php?viewkey=${viewKey}`,
@@ -44,7 +46,7 @@ async function fetchVideoInfo(viewKey: string): Promise<PHVideoInfo | null> {
     const jsonLdMatch = text.match(
       /<script type="application\/ld\+json">(.*?)<\/script>/s,
     );
-    if (!jsonLdMatch) return null;
+    if (!jsonLdMatch) return { error: "Video not found or is private" };
 
     const jsonLd = JSON.parse(jsonLdMatch[1]);
 
@@ -57,30 +59,34 @@ async function fetchVideoInfo(viewKey: string): Promise<PHVideoInfo | null> {
       .replaceAll("&period;", ".");
 
     return {
-      type: "video",
-      title: title,
-      author: jsonLd.author,
-      thumbnail: Array.isArray(jsonLd.thumbnailUrl)
-        ? jsonLd.thumbnailUrl[0]
-        : jsonLd.thumbnailUrl,
-      // deno-lint-ignore no-explicit-any
-      views: jsonLd.interactionStatistic?.find((s: any) =>
-        s.interactionType === "http://schema.org/WatchAction"
-      )?.userInteractionCount || "Unknown",
-      uploadDate: jsonLd.uploadDate
-        ? new Date(jsonLd.uploadDate).toLocaleDateString()
-        : "Unknown Date",
-      url: jsonLd.contentUrl ||
-        `https://www.pornhub.com/view_video.php?viewkey=${viewKey}`,
-      description: jsonLd.description,
+      info: {
+        type: "video",
+        title: title,
+        author: jsonLd.author,
+        thumbnail: Array.isArray(jsonLd.thumbnailUrl)
+          ? jsonLd.thumbnailUrl[0]
+          : jsonLd.thumbnailUrl,
+        // deno-lint-ignore no-explicit-any
+        views: jsonLd.interactionStatistic?.find((s: any) =>
+          s.interactionType === "http://schema.org/WatchAction"
+        )?.userInteractionCount || "Unknown",
+        uploadDate: jsonLd.uploadDate
+          ? new Date(jsonLd.uploadDate).toLocaleDateString()
+          : "Unknown Date",
+        url: jsonLd.contentUrl ||
+          `https://www.pornhub.com/view_video.php?viewkey=${viewKey}`,
+        description: jsonLd.description,
+      },
     };
   } catch (error) {
     logger.error("Failed to fetch PH video info: {error}", { error });
-    return null;
+    return { error: "Failed to fetch video info" };
   }
 }
 
-async function fetchModelInfo(username: string): Promise<PHModelInfo | null> {
+async function fetchModelInfo(
+  username: string,
+): Promise<{ info?: PHModelInfo; error?: string }> {
   try {
     const url = `https://www.pornhub.com/model/${username}`;
     const res = await fetch(url);
@@ -98,19 +104,21 @@ async function fetchModelInfo(username: string): Promise<PHModelInfo | null> {
       /<span>Video Views:<\/span>\s*<span[^>]*?>([\d,KkMm\.]+)/i,
     )?.[1];
 
-    if (!name) return null;
+    if (!name) return { error: "Model not found or profile is private" };
 
     return {
-      type: "model",
-      name,
-      subscribers: subscribers || "Unknown",
-      views: views || "Unknown",
-      avatar,
-      url,
+      info: {
+        type: "model",
+        name,
+        subscribers: subscribers || "Unknown",
+        views: views || "Unknown",
+        avatar,
+        url,
+      },
     };
   } catch (error) {
     logger.error("Failed to fetch PH model info: {error}", { error });
-    return null;
+    return { error: "Failed to fetch model info" };
   }
 }
 
@@ -128,25 +136,53 @@ export const pornhubListener: MessageListener = {
     const message = rawMessage as any;
     const content = message.content;
 
-    let info: PHInfo | null = null;
+    let result: { info?: PHInfo; error?: string } | null = null;
 
     // Check for Video
     const videoMatch = content.match(PH_VIDEO_REGEX);
     if (videoMatch) {
       const viewKey = videoMatch[1];
-      info = await fetchVideoInfo(viewKey);
+      result = await fetchVideoInfo(viewKey);
     }
 
     // Check for Model
-    if (!info) {
+    if (!result) {
       const modelMatch = content.match(PH_MODEL_REGEX);
       if (modelMatch) {
         const username = modelMatch[1];
-        info = await fetchModelInfo(username);
+        result = await fetchModelInfo(username);
       }
     }
 
-    if (!info) return;
+    if (!result || result.error || !result.info) {
+      await bot.helpers.sendMessage(message.channelId, {
+        messageReference: {
+          messageId: message.id,
+          channelId: message.channelId,
+          guildId: message.guildId,
+          failIfNotExists: false,
+        },
+        allowedMentions: { repliedUser: false },
+        flags: IS_COMPONENTS_V2,
+        components: [
+          {
+            type: ComponentV2Type.Container,
+            accent_color: 0xFF0000, // Red for error
+            components: [
+              {
+                type: ComponentV2Type.TextDisplay,
+                content: `❌ **Error**\n${
+                  result?.error || "Could not fetch content."
+                }`,
+              },
+            ],
+          },
+        ] as unknown as import("@discordeno/bot").ActionRow[],
+      });
+      return;
+    }
+
+    const info = result.info;
 
     if (info.type === "video") {
       logger.info("Pornhub listener found video: {title}", {
