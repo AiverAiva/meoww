@@ -33,15 +33,20 @@ export async function handleWNACGView(
     },
   );
 
+  const isInitial = target === "0";
+
   if (!viewId || viewId === "none") {
     return await bot.helpers.sendInteractionResponse(
       interaction.id,
       interaction.token,
       {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
+        type: isInitial
+          ? InteractionResponseTypes.ChannelMessageWithSource
+          : InteractionResponseTypes.UpdateMessage,
         data: {
-          content: "❌ Invalid session. Please try clicking the link again.",
-          flags: MessageFlags.Ephemeral,
+          content:
+            "❌ Invalid session. Please try clicking the original link again.",
+          flags: isInitial ? MessageFlags.Ephemeral : 0,
         },
       },
     );
@@ -49,25 +54,25 @@ export async function handleWNACGView(
 
   const viewer = await getWNACGFullViewer(aid, viewId);
 
+  // Since getWNACGFullViewer now handles internal errors and returns an error card,
+  // we only need to check if it returned anything at all.
   if (!viewer) {
     return await bot.helpers.sendInteractionResponse(
       interaction.id,
       interaction.token,
       {
-        type: InteractionResponseTypes.ChannelMessageWithSource,
+        type: isInitial
+          ? InteractionResponseTypes.ChannelMessageWithSource
+          : InteractionResponseTypes.UpdateMessage,
         data: {
-          content:
-            "❌ Failed to load image. The page might be blocked by Cloudflare or the link has expired. Please try again or open the link directly.",
-          flags: MessageFlags.Ephemeral,
+          content: "❌ Critical error: Failed to initialize viewer.",
+          flags: isInitial ? MessageFlags.Ephemeral : 0,
         },
       },
     );
   }
 
   try {
-    // target === '0' means it's the initial 'View in Discord' click from the public message
-    const isInitial = target === "0";
-
     await bot.helpers.sendInteractionResponse(
       interaction.id,
       interaction.token,
