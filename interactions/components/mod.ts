@@ -1,6 +1,7 @@
 import { AnyBot } from "../../types.ts";
 import { handlePixivPagination } from "./pixiv.ts";
 import { handleWNACGView } from "./wnacg.ts";
+import { handleNHentaiView } from "./nhentai.ts";
 
 /**
  * Entry point for all message component interactions.
@@ -17,5 +18,7 @@ export async function handleComponentInteraction(
     await handlePixivPagination(bot, interaction);
   } else if (customId.startsWith("wnacg_v_")) {
     await handleWNACGView(bot, interaction);
+  } else if (customId.startsWith("nhentai_v_")) {
+    await handleNHentaiView(bot, interaction);
   }
 }

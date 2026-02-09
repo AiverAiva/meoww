@@ -4,6 +4,7 @@ import { pornhubListener } from "./pornhub.ts";
 import { twitterListener } from "./twitter.ts";
 import { pixivListener } from "./pixiv.ts";
 // import { wnacgListener } from "./wnacg.ts";
+import { nhentaiListener } from "./nhentai.ts";
 
 export const messageListeners: MessageListener[] = [
   helloListener,
@@ -11,4 +12,5 @@ export const messageListeners: MessageListener[] = [
   twitterListener,
   pixivListener,
   // wnacgListener,
+  nhentaiListener,
 ];
