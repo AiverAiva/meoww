@@ -2,15 +2,18 @@ import { createContainer, createErrorCard } from "../ui_factory.ts";
 import { getPornhubPreview } from "./pornhub.ts";
 import { getTwitterPreview } from "./twitter.ts";
 import { getPixivPreview } from "./pixiv.ts";
+import { getWNACGPreview } from "./wnacg.ts";
 
 export * from "./twitter.ts";
 export * from "./pornhub.ts";
 export * from "./pixiv.ts";
+export * from "./wnacg.ts";
 
 export const SUPPORTED_PLATFORMS = [
   "Twitter / X",
   "Pornhub (Videos & Models)",
   "Pixiv (Artworks)",
+  "WNACG (Manga/Doujin)",
 ];
 
 export async function getAnyPreview(content: string) {
@@ -25,6 +28,10 @@ export async function getAnyPreview(content: string) {
   // Check Pixiv
   const pixiv = await getPixivPreview(content);
   if (pixiv) return pixiv;
+
+  // Check WNACG
+  const wnacg = await getWNACGPreview(content);
+  if (wnacg) return wnacg;
 
   return null;
 }

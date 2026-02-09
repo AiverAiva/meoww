@@ -3,10 +3,12 @@ import { helloListener } from "./hello.ts";
 import { pornhubListener } from "./pornhub.ts";
 import { twitterListener } from "./twitter.ts";
 import { pixivListener } from "./pixiv.ts";
+import { wnacgListener } from "./wnacg.ts";
 
 export const messageListeners: MessageListener[] = [
   helloListener,
   pornhubListener,
   twitterListener,
   pixivListener,
+  wnacgListener,
 ];
