@@ -13,7 +13,7 @@ export const SUPPORTED_PLATFORMS = [
   "Twitter / X",
   "Pornhub (Videos & Models)",
   "Pixiv (Artworks)",
-  "WNACG (Manga/Doujin)",
+  // "WNACG (Manga/Doujin)",
 ];
 
 export async function getAnyPreview(content: string) {
