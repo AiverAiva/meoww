@@ -196,7 +196,7 @@ export async function getWNACGPreview(content: string) {
       ...(meta.coverUrl
         ? [{
           type: ComponentV2Type.MediaGallery,
-          items: [{ media: { url: meta.coverUrl }, spoiler: true }],
+          items: [{ media: { url: meta.coverUrl }, spoiler: false }],
         }]
         : []),
       {
@@ -245,7 +245,7 @@ export async function getWNACGFullViewer(aid: string, viewId: string) {
       {
         type: ComponentV2Type.MediaGallery,
         items: viewData.highResUrl
-          ? [{ media: { url: viewData.highResUrl }, spoiler: true }]
+          ? [{ media: { url: viewData.highResUrl }, spoiler: false }]
           : [],
       },
       {

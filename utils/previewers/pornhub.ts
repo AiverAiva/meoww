@@ -152,7 +152,7 @@ export async function getPornhubPreview(content: string) {
             media: {
               url: info.thumbnail,
             },
-            spoiler: true,
+            spoiler: false,
           },
         ],
       },

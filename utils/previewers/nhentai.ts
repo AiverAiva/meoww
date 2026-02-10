@@ -103,7 +103,7 @@ export async function getNHentaiPreview(content: string) {
     const components: any[] = [
       {
         type: ComponentV2Type.MediaGallery,
-        items: [{ media: { url: coverUrl }, spoiler: true }],
+        items: [{ media: { url: coverUrl }, spoiler: false }],
       },
       {
         type: ComponentV2Type.TextDisplay,
@@ -156,7 +156,7 @@ export async function getNHentaiFullViewer(id: string, page: number) {
     const components: any[] = [
       {
         type: ComponentV2Type.MediaGallery,
-        items: [{ media: { url: imageUrl }, spoiler: true }],
+        items: [{ media: { url: imageUrl }, spoiler: false }],
       },
       {
         type: ComponentV2Type.TextDisplay,
