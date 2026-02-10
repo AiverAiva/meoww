@@ -5,6 +5,7 @@ import { twitterListener } from "./twitter.ts";
 import { pixivListener } from "./pixiv.ts";
 // import { wnacgListener } from "./wnacg.ts";
 import { nhentaiListener } from "./nhentai.ts";
+import { hanimeListener } from "./hanime.ts";
 
 export const messageListeners: MessageListener[] = [
   helloListener,
@@ -13,4 +14,5 @@ export const messageListeners: MessageListener[] = [
   pixivListener,
   // wnacgListener,
   nhentaiListener,
+  hanimeListener,
 ];

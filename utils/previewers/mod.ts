@@ -4,12 +4,14 @@ import { getTwitterPreview } from "./twitter.ts";
 import { getPixivPreview } from "./pixiv.ts";
 import { getWNACGPreview } from "./wnacg.ts";
 import { getNHentaiPreview } from "./nhentai.ts";
+import { getHanimePreview } from "./hanime.ts";
 
 export * from "./twitter.ts";
 export * from "./pornhub.ts";
 export * from "./pixiv.ts";
 export * from "./wnacg.ts";
 export * from "./nhentai.ts";
+export * from "./hanime.ts";
 
 export const SUPPORTED_PLATFORMS = [
   "Twitter / X",
@@ -17,6 +19,7 @@ export const SUPPORTED_PLATFORMS = [
   "Pixiv (Artworks)",
   // "WNACG (Manga/Doujin)",
   "nHentai",
+  "Hanime",
 ];
 
 export async function getAnyPreview(content: string) {
@@ -39,6 +42,10 @@ export async function getAnyPreview(content: string) {
   // Check nHentai
   const nhentai = await getNHentaiPreview(content);
   if (nhentai) return nhentai;
+
+  // Check Hanime
+  const hanime = await getHanimePreview(content);
+  if (hanime) return hanime;
 
   return null;
 }
