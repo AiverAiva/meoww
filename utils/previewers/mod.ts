@@ -19,7 +19,7 @@ export const SUPPORTED_PLATFORMS = [
   "Pixiv (Artworks)",
   // "WNACG (Manga/Doujin)",
   "nHentai",
-  "Hanime1.me (Videos)",
+  // "Hanime1.me (Videos)",
 ];
 
 export async function getAnyPreview(content: string) {
