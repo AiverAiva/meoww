@@ -29,6 +29,8 @@ const bot = createBot({
       data: true,
       user: true,
       member: true,
+      channelId: true,
+      message: true,
     } as const,
   },
 });

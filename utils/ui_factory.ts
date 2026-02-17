@@ -54,6 +54,34 @@ export function createNoLinksFoundCard(supportedPlatforms: string[]) {
 }
 
 /**
+ * Creates a source selection card when a 6-digit ID is detected.
+ */
+export function createSourceSelectionCard(id: string) {
+  return {
+    type: ComponentV2Type.Container,
+    accent_color: UI_COLORS.INFO,
+    components: [
+      {
+        type: ComponentV2Type.TextDisplay,
+        content:
+          `### 📚 Select Source\nWhich source do you want to preview \`${id}\` from?`,
+      },
+      {
+        type: ComponentV2Type.ActionRow,
+        components: [
+          {
+            type: ComponentV2Type.Button,
+            style: 1, // Primary
+            label: "nHentai",
+            custom_id: `id_preview:nhentai:${id}`,
+          },
+        ],
+      },
+    ],
+  };
+}
+
+/**
  * Generic container helper.
  */
 // deno-lint-ignore no-explicit-any

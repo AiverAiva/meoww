@@ -2,6 +2,8 @@ import { AnyBot } from "../../types.ts";
 import { handlePixivPagination } from "./pixiv.ts";
 import { handleWNACGView } from "./wnacg.ts";
 import { handleNHentaiView } from "./nhentai.ts";
+import { handleIdPreview } from "./id_preview.ts";
+import { handleShare } from "./share.ts";
 
 /**
  * Entry point for all message component interactions.
@@ -20,5 +22,9 @@ export async function handleComponentInteraction(
     await handleWNACGView(bot, interaction);
   } else if (customId.startsWith("nhentai_v_")) {
     await handleNHentaiView(bot, interaction);
+  } else if (customId.startsWith("id_preview:")) {
+    await handleIdPreview(bot, interaction);
+  } else if (customId.startsWith("share_p:")) {
+    await handleShare(bot, interaction);
   }
 }
