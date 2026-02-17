@@ -1,6 +1,5 @@
 import { ComponentV2Type } from "../components_v2.ts";
 import { logger } from "../logger.ts";
-import { createErrorCard } from "../ui_factory.ts";
 
 export const NHENTAI_REGEX = /https?:\/\/(?:www\.)?nhentai\.net\/g\/(\d+)\/?/;
 
@@ -47,16 +46,18 @@ async function fetchNHentaiGallery(id: string): Promise<NHentaiGallery> {
   const url = `https://nhentai.net/api/gallery/${id}`;
   try {
     const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
+    if (res.status === 404) {
+      throw new Error(
+        "nHentai gallery not found (404). Please check if the ID is correct.",
+      );
+    }
     if (res.status === 403) {
       throw new Error(
         "Access Denied (403). nHentai might be behind Cloudflare verification.",
       );
     }
-    if (res.status === 404) {
-      throw new Error("Gallery not found (404).");
-    }
     if (!res.ok) {
-      throw new Error(`Server returned status ${res.status}`);
+      throw new Error(`nHentai API returned status ${res.status}`);
     }
     return await res.json();
   } catch (error) {
@@ -133,14 +134,10 @@ export async function getNHentaiPreview(content: string) {
     return { color: 0xED2553, components };
   } catch (error) {
     return {
-      color: 0xED2553,
-      components: [
-        createErrorCard(
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch nHentai data.",
-        ),
-      ],
+      error: error instanceof Error
+        ? error.message
+        : "Failed to fetch nHentai data.",
+      color: 0xFF0000,
     };
   }
 }
@@ -214,12 +211,8 @@ export async function getNHentaiFullViewer(id: string, page: number) {
     return { color: 0xED2553, components };
   } catch (error) {
     return {
-      color: 0xED2553,
-      components: [
-        createErrorCard(
-          error instanceof Error ? error.message : "Failed to load image.",
-        ),
-      ],
+      error: error instanceof Error ? error.message : "Failed to load image.",
+      color: 0xFF0000,
     };
   }
 }

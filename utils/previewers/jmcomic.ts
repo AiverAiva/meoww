@@ -1,5 +1,4 @@
 import { ComponentV2Type } from "../components_v2.ts";
-import { createErrorCard } from "../ui_factory.ts";
 
 export const JMCOMIC_REGEX =
   /https?:\/\/(?:www\.)?(?:18comic\.(?:vip|org|art|xyz)|jm-comic\.(?:me|top))\/(?:photo|album)\/(\d+)/;
@@ -64,11 +63,34 @@ export async function getJMComicPreview(content: string) {
       },
     });
 
+    // 1. Check for Redirect (often 18comic redirects to /error/album_missing)
+    if (
+      response.url.includes("error/album_missing") ||
+      response.url.includes("/error/")
+    ) {
+      throw new Error("Comic not found (Redirected to error page).");
+    }
+
+    if (response.status === 404) {
+      throw new Error(
+        "Comic not found (404). Please check if the ID is correct.",
+      );
+    }
     if (!response.ok) {
-      throw new Error(`Failed to fetch 18comic: ${response.statusText}`);
+      throw new Error(
+        `Failed to fetch 18comic: ${response.status} ${response.statusText}`,
+      );
     }
 
     const html = await response.text();
+
+    if (
+      html.includes("頁面不存在") || html.includes("404 Not Found") ||
+      html.includes("找不到該頁面") ||
+      html.includes('class="panel-body"') && html.includes("沒有找到該相冊")
+    ) {
+      throw new Error("Comic not found or content is restricted.");
+    }
 
     // Extract title
     const titleMatch = html.match(/<title>(.*?)<\/title>/i);
@@ -147,14 +169,10 @@ export async function getJMComicPreview(content: string) {
     return { color: 0xFB7299, components };
   } catch (error) {
     return {
-      color: 0xFB7299,
-      components: [
-        createErrorCard(
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch 18Comic data.",
-        ),
-      ],
+      error: error instanceof Error
+        ? error.message
+        : "Failed to fetch 18Comic data.",
+      color: 0xFF0000,
     };
   }
 }
@@ -183,8 +201,30 @@ export async function getJMComicFullViewer(id: string, page: number) {
         "Upgrade-Insecure-Requests": "1",
       },
     });
-    if (!response.ok) throw new Error("Failed to fetch JMComic data.");
+
+    // 1. Check for Redirect (often 18comic redirects to /error/album_missing)
+    if (
+      response.url.includes("error/album_missing") ||
+      response.url.includes("/error/")
+    ) {
+      throw new Error("Comic not found (Redirected to error page).");
+    }
+
+    if (response.status === 404) {
+      throw new Error("Comic not found (404).");
+    }
+    if (!response.ok) {
+      throw new Error(`Failed to fetch JMComic data: ${response.status}`);
+    }
     const html = await response.text();
+
+    if (
+      html.includes("頁面不存在") || html.includes("404 Not Found") ||
+      html.includes("找不到該頁面") ||
+      html.includes('class="panel-body"') && html.includes("沒有找到該相冊")
+    ) {
+      throw new Error("Comic not found or content is restricted.");
+    }
 
     // Extract page count
     const selectMatches = html.match(/<select[^>]*>([\s\S]*?)<\/select>/gi);
@@ -290,12 +330,8 @@ export async function getJMComicFullViewer(id: string, page: number) {
     return { color: 0xFB7299, components };
   } catch (error) {
     return {
-      color: 0xFB7299,
-      components: [
-        createErrorCard(
-          error instanceof Error ? error.message : "Failed to load image.",
-        ),
-      ],
+      error: error instanceof Error ? error.message : "Failed to load image.",
+      color: 0xFF0000,
     };
   }
 }
