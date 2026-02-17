@@ -63,8 +63,9 @@ export const previewCommand: Command = {
 
     if (!preview) {
       logger.debug("No link preview found for: {content}", { content });
-      // Check for exactly 6 digits anywhere in the message.
-      const digitMatch = content.match(/(\d{6})/);
+      // Check for exactly 5-7 digits (standard for nHentai/JMComic IDs).
+      // We ensure it's not part of a longer digit sequence.
+      const digitMatch = content.match(/(?<!\d)(\d{5,7})(?!\d)/);
 
       if (digitMatch) {
         const id = digitMatch[1];
