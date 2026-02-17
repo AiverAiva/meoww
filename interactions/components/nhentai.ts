@@ -69,7 +69,7 @@ export async function handleNHentaiView(
           ? InteractionResponseTypes.ChannelMessageWithSource
           : InteractionResponseTypes.UpdateMessage,
         data: {
-          flags: IS_COMPONENTS_V2,
+          flags: IS_COMPONENTS_V2 | (isInitial ? 64 : 0),
           components:
             components as unknown as import("@discordeno/bot").ActionRow[],
         },
