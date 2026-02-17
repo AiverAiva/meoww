@@ -2,6 +2,7 @@ import { AnyBot } from "../../types.ts";
 import { handlePixivPagination } from "./pixiv.ts";
 import { handleWNACGView } from "./wnacg.ts";
 import { handleNHentaiView } from "./nhentai.ts";
+import { handleJMComicView } from "./jmcomic.ts";
 import { handleIdPreview } from "./id_preview.ts";
 import { handleShare } from "./share.ts";
 
@@ -22,6 +23,8 @@ export async function handleComponentInteraction(
     await handleWNACGView(bot, interaction);
   } else if (customId.startsWith("nhentai_v_")) {
     await handleNHentaiView(bot, interaction);
+  } else if (customId.startsWith("jmcomic_v_")) {
+    await handleJMComicView(bot, interaction);
   } else if (customId.startsWith("id_preview:")) {
     await handleIdPreview(bot, interaction);
   } else if (customId.startsWith("share_p:")) {

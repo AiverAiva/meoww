@@ -3,6 +3,7 @@ import { AnyBot } from "../../types.ts";
 import { logger } from "../../utils/logger.ts";
 import {
   formatPreviewComponents,
+  getJMComicPreview,
   getNHentaiPreview,
 } from "../../utils/previewers/mod.ts";
 import { IS_COMPONENTS_V2 } from "../../utils/components_v2.ts";
@@ -49,6 +50,8 @@ export async function handleShare(
 
   if (source === "nhentai") {
     preview = await getNHentaiPreview(`https://nhentai.net/g/${id}/`);
+  } else if (source === "jmcomic") {
+    preview = await getJMComicPreview(`https://18comic.vip/photo/${id}`);
   }
 
   if (!preview) {

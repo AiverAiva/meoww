@@ -2,6 +2,7 @@ import { InteractionResponseTypes, MessageFlags } from "@discordeno/bot";
 import { AnyBot } from "../../types.ts";
 import { logger } from "../../utils/logger.ts";
 import { handleNHentaiView } from "./nhentai.ts";
+import { handleJMComicView } from "./jmcomic.ts";
 
 /**
  * Handles generic ID-based preview interactions.
@@ -25,6 +26,9 @@ export async function handleIdPreview(
   switch (source) {
     case "nhentai":
       await handleNHentaiView(bot, interaction);
+      break;
+    case "jmcomic":
+      await handleJMComicView(bot, interaction);
       break;
     default:
       await bot.helpers.sendInteractionResponse(

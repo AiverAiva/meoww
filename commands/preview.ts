@@ -93,24 +93,32 @@ export const previewCommand: Command = {
 
     const components = formatPreviewComponents(preview) as any;
 
-    // Inject share button for nhentai if it's an ephemeral preview
-    if (content.includes("nhentai.net/g/")) {
+    // Inject share button for supported sources if it's an ephemeral preview
+    const jmMatch =
+      content.match(/18comic\.(?:vip|org|art|xyz)\/photo\/(\d+)/) ||
+      content.match(/jm-comic\.(?:me|top)\/photo\/(\d+)/);
+    const nhMatch = content.match(/nhentai\.net\/g\/(\d+)/);
+
+    const sourceMatch = jmMatch
+      ? { id: jmMatch[1], name: "jmcomic" }
+      : nhMatch
+      ? { id: nhMatch[1], name: "nhentai" }
+      : null;
+
+    if (sourceMatch) {
       try {
-        const id = content.match(/nhentai\.net\/g\/(\d+)/)?.[1];
-        if (id) {
-          const container = components[0];
-          if (container && container.components) {
-            const actionRow = container.components.find((c: any) =>
-              c.type === 1 && c.components && c.components.length < 5
-            );
-            if (actionRow) {
-              actionRow.components.push({
-                type: 2,
-                style: 2,
-                label: "📤 Share Public",
-                custom_id: `share_p:nhentai:${id}`,
-              });
-            }
+        const container = components[0];
+        if (container && container.components) {
+          const actionRow = container.components.find((c: any) =>
+            c.type === 1 && c.components && c.components.length < 5
+          );
+          if (actionRow) {
+            actionRow.components.push({
+              type: 2,
+              style: 2,
+              label: "📤 Share Public",
+              custom_id: `share_p:${sourceMatch.name}:${sourceMatch.id}`,
+            });
           }
         }
       } catch (e) {

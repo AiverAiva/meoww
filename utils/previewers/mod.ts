@@ -5,6 +5,7 @@ import { getPixivPreview } from "./pixiv.ts";
 import { getWNACGPreview } from "./wnacg.ts";
 import { getNHentaiPreview } from "./nhentai.ts";
 import { getHanimePreview } from "./hanime.ts";
+import { getJMComicPreview } from "./jmcomic.ts";
 
 export * from "./twitter.ts";
 export * from "./pornhub.ts";
@@ -12,6 +13,7 @@ export * from "./pixiv.ts";
 export * from "./wnacg.ts";
 export * from "./nhentai.ts";
 export * from "./hanime.ts";
+export * from "./jmcomic.ts";
 
 export const SUPPORTED_PLATFORMS = [
   "Twitter / X",
@@ -19,6 +21,7 @@ export const SUPPORTED_PLATFORMS = [
   "Pixiv (Artworks)",
   // "WNACG (Manga/Doujin)",
   "nHentai",
+  "18Comic (JM)",
   // "Hanime1.me (Videos)",
 ];
 
@@ -47,12 +50,17 @@ export async function getAnyPreview(content: string) {
   const hanime = await getHanimePreview(content);
   if (hanime) return hanime;
 
+  // Check JMComic
+  const jmcomic = await getJMComicPreview(content);
+  if (jmcomic) return jmcomic;
+
   return null;
 }
 
 /**
  * Formats a preview result into valid Component V2 structures.
- * Returns the flat array of components directly to avoid invalid nesting in Sections/Containers.
+ * To avoid 'Invalid Form Body' errors (UNION_TYPE_CHOICES), we keep only TextDisplay in Containers.
+ * MediaGallery and ActionRow components MUST be at the top level.
  */
 export function formatPreviewComponents(result: {
   // deno-lint-ignore no-explicit-any
