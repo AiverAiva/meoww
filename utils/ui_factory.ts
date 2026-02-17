@@ -75,12 +75,12 @@ export function createSourceSelectionCard(id: string) {
             label: "nHentai",
             custom_id: `id_preview:nhentai:${id}`,
           },
-          {
-            type: ComponentV2Type.Button,
-            style: 1, // Primary
-            label: "18Comic",
-            custom_id: `id_preview:jmcomic:${id}`,
-          },
+          // {
+          //   type: ComponentV2Type.Button,
+          //   style: 1, // Primary
+          //   label: "18Comic",
+          //   custom_id: `id_preview:jmcomic:${id}`,
+          // },
         ],
       },
     ],

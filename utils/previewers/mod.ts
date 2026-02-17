@@ -21,7 +21,7 @@ export const SUPPORTED_PLATFORMS = [
   "Pixiv (Artworks)",
   // "WNACG (Manga/Doujin)",
   "nHentai",
-  "18Comic (JM)",
+  // "18Comic (JM)",
   // "Hanime1.me (Videos)",
 ];
 
