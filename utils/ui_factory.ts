@@ -98,3 +98,33 @@ export function createContainer(components: any[], accentColor?: number) {
     components,
   };
 }
+/**
+ * Creates options for a jump-to-page dropdown.
+ */
+export function createPageJumpOptions(currentPage: number, totalPages: number) {
+  const pagesToInclude = new Set<number>();
+  pagesToInclude.add(1);
+  if (totalPages > 0) pagesToInclude.add(totalPages);
+
+  // Decimals/Intervals
+  if (totalPages > 20) {
+    for (let i = 1; i <= 10; i++) {
+      const p = Math.floor((totalPages * i) / 10);
+      if (p >= 1 && p <= totalPages) pagesToInclude.add(p);
+    }
+  } else {
+    for (let i = 1; i <= totalPages; i++) pagesToInclude.add(i);
+  }
+
+  // Neighborhood
+  for (let i = currentPage - 5; i <= currentPage + 5; i++) {
+    if (i >= 1 && i <= (totalPages || 9999)) pagesToInclude.add(i);
+  }
+
+  const sortedPages = Array.from(pagesToInclude).sort((a, b) => a - b);
+  return sortedPages.slice(0, 25).map((p) => ({
+    label: `Page ${p}`,
+    value: p.toString(),
+    default: p === currentPage,
+  }));
+}

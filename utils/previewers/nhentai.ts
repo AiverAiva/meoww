@@ -1,5 +1,6 @@
 import { ComponentV2Type } from "../components_v2.ts";
 import { logger } from "../logger.ts";
+import { createPageJumpOptions } from "../ui_factory.ts";
 
 export const NHENTAI_REGEX = /https?:\/\/(?:www\.)?nhentai\.net\/g\/(\d+)\/?/;
 
@@ -203,6 +204,18 @@ export async function getNHentaiFullViewer(id: string, page: number) {
             label: "⏩",
             custom_id: `nhentai_v_${id}_${pageCount}_${clampedPage}_l`,
             disabled: clampedPage === pageCount,
+          },
+        ],
+      });
+
+      components.push({
+        type: ComponentV2Type.ActionRow,
+        components: [
+          {
+            type: ComponentV2Type.StringSelect,
+            custom_id: `nhentai_v_${id}_goto_${clampedPage}`,
+            placeholder: "Jump to page...",
+            options: createPageJumpOptions(clampedPage, pageCount),
           },
         ],
       });

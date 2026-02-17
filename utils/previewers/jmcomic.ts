@@ -1,4 +1,5 @@
 import { ComponentV2Type } from "../components_v2.ts";
+import { createPageJumpOptions } from "../ui_factory.ts";
 
 export const JMCOMIC_REGEX =
   /https?:\/\/(?:www\.)?(?:18comic\.(?:vip|org|art|xyz)|jm-comic\.(?:me|top))\/(?:photo|album)\/(\d+)/;
@@ -295,6 +296,18 @@ export async function getJMComicFullViewer(id: string, page: number) {
             label: "⏩",
             custom_id: `jmcomic_v_${id}_${pageCount || 999}_${clampedPage}_l`,
             disabled: pageCount > 0 && clampedPage === pageCount,
+          },
+        ],
+      });
+
+      components.push({
+        type: ComponentV2Type.ActionRow,
+        components: [
+          {
+            type: ComponentV2Type.StringSelect,
+            custom_id: `jmcomic_v_${id}_goto_${clampedPage}`,
+            placeholder: "Jump to page...",
+            options: createPageJumpOptions(clampedPage, pageCount || 0),
           },
         ],
       });

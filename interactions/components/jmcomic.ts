@@ -23,7 +23,13 @@ export async function handleJMComicView(
   const idParts = customId.split(":");
 
   const id = idParts.length > 2 ? idParts[2] : parts[2];
-  const targetPage = parseInt(parts[3], 10) || 1;
+  let targetPage = parseInt(parts[3], 10) || 1;
+
+  // Handle StringSelect values for "Jump to page"
+  if (interaction.data?.values && interaction.data.values.length > 0) {
+    targetPage = parseInt(interaction.data.values[0], 10);
+  }
+
   const buttonType = parts.length > 5 ? parts[5] : parts[4];
 
   const isInitial = buttonType === "0";
