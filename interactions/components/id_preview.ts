@@ -1,4 +1,4 @@
-import { InteractionResponseTypes, MessageFlags } from "@discordeno/bot";
+import { InteractionResponseTypes } from "@discordeno/bot";
 import { AnyBot } from "../../types.ts";
 import { logger } from "../../utils/logger.ts";
 import { handleNHentaiView } from "./nhentai.ts";
@@ -38,7 +38,6 @@ export async function handleIdPreview(
           type: InteractionResponseTypes.ChannelMessageWithSource,
           data: {
             content: `❌ Unsupported preview source: \`${source}\``,
-            flags: MessageFlags.Ephemeral,
           },
         },
       );

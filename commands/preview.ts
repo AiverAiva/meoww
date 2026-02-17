@@ -3,7 +3,6 @@ import {
   DiscordApplicationIntegrationType,
   DiscordInteractionContextType,
   InteractionResponseTypes,
-  MessageFlags,
 } from "@discordeno/bot";
 import { Command } from "../types.ts";
 import {
@@ -50,15 +49,13 @@ export const previewCommand: Command = {
     }
 
     // Defer the response since fetching might take time.
-    // Making it ephemeral as requested.
+    // Making it public as requested.
     await bot.helpers.sendInteractionResponse(
       interaction.id,
       interaction.token,
       {
         type: InteractionResponseTypes.DeferredChannelMessageWithSource,
-        data: {
-          flags: MessageFlags.Ephemeral,
-        },
+        data: {},
       },
     );
 
@@ -74,7 +71,7 @@ export const previewCommand: Command = {
         return await bot.helpers.editOriginalInteractionResponse(
           interaction.token,
           {
-            flags: IS_COMPONENTS_V2 | MessageFlags.Ephemeral,
+            flags: IS_COMPONENTS_V2,
             // deno-lint-ignore no-explicit-any
             components: [createSourceSelectionCard(id)] as any,
           },
@@ -84,56 +81,23 @@ export const previewCommand: Command = {
       return await bot.helpers.editOriginalInteractionResponse(
         interaction.token,
         {
-          flags: IS_COMPONENTS_V2 | MessageFlags.Ephemeral,
+          flags: IS_COMPONENTS_V2,
           // deno-lint-ignore no-explicit-any
           components: [createNoLinksFoundCard(SUPPORTED_PLATFORMS)] as any,
         },
       );
     }
 
-    const components = formatPreviewComponents(preview) as any;
+    const components = formatPreviewComponents(preview);
 
-    // Inject share button for supported sources if it's an ephemeral preview
-    const jmMatch =
-      content.match(/18comic\.(?:vip|org|art|xyz)\/photo\/(\d+)/) ||
-      content.match(/jm-comic\.(?:me|top)\/photo\/(\d+)/);
-    const nhMatch = content.match(/nhentai\.net\/g\/(\d+)/);
-
-    const sourceMatch = jmMatch
-      ? { id: jmMatch[1], name: "jmcomic" }
-      : nhMatch
-      ? { id: nhMatch[1], name: "nhentai" }
-      : null;
-
-    if (sourceMatch) {
-      try {
-        const container = components[0];
-        if (container && container.components) {
-          const actionRow = container.components.find((c: any) =>
-            c.type === 1 && c.components && c.components.length < 5
-          );
-          if (actionRow) {
-            actionRow.components.push({
-              type: 2,
-              style: 2,
-              label: "📤 Share Public",
-              custom_id: `share_p:${sourceMatch.name}:${sourceMatch.id}`,
-            });
-          }
-        }
-      } catch (e) {
-        logger.debug("Failed to inject share button in preview command: {e}", {
-          e,
-        });
-      }
-    }
+    // Injection of share button is no longer needed since we are not using ephemeral previews
 
     await bot.helpers.editOriginalInteractionResponse(
       interaction.token,
       {
-        flags: IS_COMPONENTS_V2 | MessageFlags.Ephemeral,
-        // deno-lint-ignore no-explicit-any
-        components: components as any,
+        flags: IS_COMPONENTS_V2,
+        components:
+          components as unknown as import("@discordeno/bot").ActionRow[],
       },
     );
   },

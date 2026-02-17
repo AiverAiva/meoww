@@ -1,4 +1,4 @@
-import { InteractionResponseTypes, MessageFlags } from "@discordeno/bot";
+import { InteractionResponseTypes } from "@discordeno/bot";
 import { AnyBot } from "../../types.ts";
 import { logger } from "../../utils/logger.ts";
 import {
@@ -49,39 +49,17 @@ export async function handleNHentaiView(
           : InteractionResponseTypes.UpdateMessage,
         data: {
           content: "❌ Critical error: Failed to fetch nHentai data.",
-          flags: isInitial ? MessageFlags.Ephemeral : 0,
         },
       },
     );
   }
 
   try {
-    const components = formatPreviewComponents(data) as any;
+    const components = formatPreviewComponents(data);
 
     // Only inject 'Share Public' for the initial Quick Preview card.
     // We skip 'isInitial' (View in Discord) because the viewer already has 5 buttons.
-    if (isQuickPreview) {
-      try {
-        const container = components[0];
-        if (container && container.components) {
-          // Find an ActionRow that isn't full (limit 5)
-          const actionRow = container.components.find((c: any) =>
-            c.type === 1 && c.components && c.components.length < 5
-          );
-
-          if (actionRow) {
-            actionRow.components.push({
-              type: 2, // Button type
-              style: 2, // Secondary
-              label: "📤 Share Public",
-              custom_id: `share_p:nhentai:${id}`,
-            });
-          }
-        }
-      } catch (e) {
-        logger.debug("Failed to inject share button: {e}", { e });
-      }
-    }
+    // Injecting share button is no longer needed as we're not using ephemeral
 
     await bot.helpers.sendInteractionResponse(
       interaction.id,
@@ -91,7 +69,7 @@ export async function handleNHentaiView(
           ? InteractionResponseTypes.ChannelMessageWithSource
           : InteractionResponseTypes.UpdateMessage,
         data: {
-          flags: IS_COMPONENTS_V2 | (isInitial ? MessageFlags.Ephemeral : 0),
+          flags: IS_COMPONENTS_V2,
           components:
             components as unknown as import("@discordeno/bot").ActionRow[],
         },
