@@ -119,12 +119,14 @@ export async function getNHentaiPreview(content: string) {
       },
       {
         type: ComponentV2Type.ActionRow,
-        components: [{
-          type: ComponentV2Type.Button,
-          style: 1,
-          label: "📂 View in Discord",
-          custom_id: `nhentai_v_${gallery.id}_1_0_0`,
-        }],
+        components: [
+          {
+            type: ComponentV2Type.Button,
+            style: 1,
+            label: "📂 View in Discord",
+            custom_id: `nhentai_v_${gallery.id}_1_0_0`,
+          },
+        ],
       },
     ];
 

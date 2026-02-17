@@ -140,11 +140,6 @@ export async function getJMComicPreview(content: string) {
           style: 1,
           label: "📂 View in Discord",
           custom_id: `jmcomic_v_${id}_1_0_0`,
-        }, {
-          type: ComponentV2Type.Button,
-          style: 5, // Link
-          label: "🌐 View Online",
-          url: originalUrl,
         }],
       },
     ];
