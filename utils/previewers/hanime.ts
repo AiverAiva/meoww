@@ -174,6 +174,7 @@ export async function getHanimePreview(content: string) {
 
   return {
     color: 0xFF1744, // Red/Pink color for hanime
+    isNSFW: true,
     components,
   };
 }

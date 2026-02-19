@@ -6,6 +6,7 @@ import {
   getPixivPreview,
   PIXIV_REGEX,
 } from "../../utils/previewers/mod.ts";
+import { isNSFWSafe, sendNSFWMessageError } from "../../utils/nsfw_check.ts";
 
 export const pixivListener: MessageListener = {
   name: "pixiv",
@@ -23,6 +24,13 @@ export const pixivListener: MessageListener = {
 
     const preview = await getPixivPreview(content);
     if (!preview) return;
+
+    // Check NSFW safety if content is adult
+    const isSafe = await isNSFWSafe(bot, message.channelId, message.guildId);
+    if (preview.isNSFW && !isSafe) {
+      await sendNSFWMessageError(bot, message.channelId, message.id);
+      return;
+    }
 
     logger.info("Pixiv listener triggered in channel {id}", {
       id: message.channelId,

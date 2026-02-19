@@ -13,6 +13,7 @@ interface PixivInfo {
   url: string;
   description: string;
   tags: string[];
+  xRestrict: number;
 }
 
 export async function getPixivPreview(content: string, pageIndex = 0) {
@@ -31,6 +32,10 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
     }
 
     const data = await res.json();
+    logger.debug("Pixiv API Data: {id}, x_restrict: {restrict}", {
+      id: artworkId,
+      restrict: data.x_restrict,
+    });
 
     let imageUrls: string[] = data.image_proxy_urls ||
       [`https://pixiv.cat/${artworkId}.jpg`];
@@ -52,8 +57,10 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
       url: url,
       description: data.description || "",
       tags: data.tags || [],
+      xRestrict: data.x_restrict || 0,
     };
 
+    const isNSFW = info.xRestrict > 0;
     const pageCount = info.imageUrls.length;
     const safePageIndex = Math.max(0, Math.min(pageIndex, pageCount - 1));
     const currentImage = info.imageUrls[safePageIndex];
@@ -103,6 +110,11 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
         type: ComponentV2Type.TextDisplay,
         content: `🏷️ ${tagBlock}`.substring(0, 1000), // Larger limit for tags
       },
+      {
+        type: ComponentV2Type.TextDisplay,
+        content:
+          "-# Adult content detection is based on platform metadata. If NSFW content is incorrectly displayed in a non-NSFW channel, please delete it manually.",
+      },
     ];
 
     // Add Pagination Buttons if more than 1 page
@@ -114,36 +126,42 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
             type: ComponentV2Type.Button,
             style: 2, // Secondary
             label: "⏪",
-            custom_id: `pixiv_p_${artworkId}_f`, // f = first
-            disabled: safePageIndex <= 0,
+            custom_id: `pixiv_v_${artworkId}_0_${safePageIndex}_f`,
+            disabled: safePageIndex === 0,
           },
           {
             type: ComponentV2Type.Button,
             style: 2, // Secondary
             label: "⬅️",
-            custom_id: `pixiv_p_${artworkId}_v_${safePageIndex - 1}`, // v = prev
-            disabled: safePageIndex <= 0,
+            custom_id: `pixiv_v_${artworkId}_${
+              safePageIndex - 1
+            }_${safePageIndex}_v`,
+            disabled: safePageIndex === 0,
           },
           {
             type: ComponentV2Type.Button,
             style: 2,
             label: `${safePageIndex + 1} / ${pageCount}`,
-            custom_id: `pixiv_info_${artworkId}`,
+            custom_id: `pixiv_info`,
             disabled: true,
           },
           {
             type: ComponentV2Type.Button,
             style: 2, // Secondary
             label: "➡️",
-            custom_id: `pixiv_p_${artworkId}_n_${safePageIndex + 1}`, // n = next
-            disabled: safePageIndex >= pageCount - 1,
+            custom_id: `pixiv_v_${artworkId}_${
+              safePageIndex + 1
+            }_${safePageIndex}_n`,
+            disabled: safePageIndex === pageCount - 1,
           },
           {
             type: ComponentV2Type.Button,
             style: 2, // Secondary
             label: "⏩",
-            custom_id: `pixiv_p_${artworkId}_l`, // l = last
-            disabled: safePageIndex >= pageCount - 1,
+            custom_id: `pixiv_v_${artworkId}_${
+              pageCount - 1
+            }_${safePageIndex}_l`,
+            disabled: safePageIndex === pageCount - 1,
           },
         ],
       });
@@ -152,6 +170,7 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
     return {
       color: 0x0096FA,
       components,
+      isNSFW,
     };
   } catch (error) {
     logger.error("Failed to fetch Pixiv info: {error}", { error });

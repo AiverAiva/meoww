@@ -6,6 +6,7 @@ import {
   getJMComicPreview,
   JMCOMIC_REGEX,
 } from "../../utils/previewers/mod.ts";
+import { isNSFWSafe, sendNSFWMessageError } from "../../utils/nsfw_check.ts";
 
 export const jmcomicListener: MessageListener = {
   name: "jmcomic",
@@ -26,6 +27,13 @@ export const jmcomicListener: MessageListener = {
     const preview = await getJMComicPreview(content);
 
     if (!preview) return;
+
+    // Check NSFW safety
+    const isSafe = await isNSFWSafe(bot, message.channelId, message.guildId);
+    if (preview.isNSFW && !isSafe) {
+      await sendNSFWMessageError(bot, message.channelId, message.id);
+      return;
+    }
 
     logger.info(
       "JMComic listener triggered in channel {id}.",

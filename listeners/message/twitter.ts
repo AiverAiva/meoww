@@ -7,6 +7,7 @@ import {
   X_I_REGEX,
   X_REGEX,
 } from "../../utils/previewers/mod.ts";
+import { isNSFWSafe, sendNSFWMessageError } from "../../utils/nsfw_check.ts";
 
 export const twitterListener: MessageListener = {
   name: "twitter",
@@ -24,6 +25,13 @@ export const twitterListener: MessageListener = {
 
     const preview = await getTwitterPreview(content);
     if (!preview) return;
+
+    // Check NSFW safety if content is adult
+    const isSafe = await isNSFWSafe(bot, message.channelId, message.guildId);
+    if (preview.isNSFW && !isSafe) {
+      await sendNSFWMessageError(bot, message.channelId, message.id);
+      return;
+    }
 
     logger.info("Twitter listener found tweet in channel {id}", {
       id: message.channelId,

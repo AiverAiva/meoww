@@ -173,10 +173,11 @@ export async function getWNACGPreview(content: string) {
         }],
       },
     ];
-    return { color: 0x9B59B6, components };
+    return { color: 0x9B59B6, components, isNSFW: true };
   } catch (error) {
     return {
       color: 0x9B59B6,
+      isNSFW: true,
       components: [createErrorCard(
         error instanceof Error
           ? error.message
@@ -261,10 +262,11 @@ export async function getWNACGFullViewer(aid: string, page: number) {
       });
     }
 
-    return { color: 0x9B59B6, components };
+    return { color: 0x9B59B6, components, isNSFW: true };
   } catch (error) {
     return {
       color: 0x9B59B6,
+      isNSFW: true,
       components: [
         createErrorCard(
           error instanceof Error ? error.message : "Failed to load image.",

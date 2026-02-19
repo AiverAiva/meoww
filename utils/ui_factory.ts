@@ -28,9 +28,9 @@ export function createErrorCard(message: string) {
 }
 
 /**
- * Creates a "No Supported Links Found" information card.
+ * Creates a "No Supported Links Found" information card with categorized sections.
  */
-export function createNoLinksFoundCard(supportedPlatforms: string[]) {
+export function createNoLinksFoundCard() {
   return {
     type: ComponentV2Type.Container,
     accent_color: UI_COLORS.INFO,
@@ -45,9 +45,12 @@ export function createNoLinksFoundCard(supportedPlatforms: string[]) {
       },
       {
         type: ComponentV2Type.TextDisplay,
-        content: `**Supported Platforms:**\n${
-          supportedPlatforms.map((p) => `• ${p}`).join("\n")
-        }`,
+        content: `**🌐 Previewable Links**\n• Twitter / X\n• Pixiv Artworks`,
+      },
+      {
+        type: ComponentV2Type.TextDisplay,
+        content:
+          `**🔞 NSFW Limited Links**\n• Twitter / X (Adult content)\n• Pixiv Artworks (Adult content)\n• nHentai\n• WNACG (Manga/Doujin)\n• 18Comic (JM)\n• Hanime1.me (Videos)\n• Pornhub Videos & Models`,
       },
     ],
   };

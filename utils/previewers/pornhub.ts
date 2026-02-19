@@ -188,5 +188,6 @@ export async function getPornhubPreview(content: string) {
   return {
     color: 0xFFA31A, // Pornhub Orange
     components,
+    isNSFW: true,
   };
 }

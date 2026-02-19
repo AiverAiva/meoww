@@ -132,13 +132,14 @@ export async function getNHentaiPreview(content: string) {
       },
     ];
 
-    return { color: 0xED2553, components };
+    return { color: 0xED2553, components, isNSFW: true };
   } catch (error) {
     return {
       error: error instanceof Error
         ? error.message
         : "Failed to fetch nHentai data.",
       color: 0xFF0000,
+      isNSFW: true,
     };
   }
 }
@@ -221,11 +222,12 @@ export async function getNHentaiFullViewer(id: string, page: number) {
       });
     }
 
-    return { color: 0xED2553, components };
+    return { color: 0xED2553, components, isNSFW: true };
   } catch (error) {
     return {
       error: error instanceof Error ? error.message : "Failed to load image.",
       color: 0xFF0000,
+      isNSFW: true,
     };
   }
 }

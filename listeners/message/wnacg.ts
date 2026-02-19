@@ -6,6 +6,7 @@ import {
   getWNACGPreview,
   WNACG_REGEX,
 } from "../../utils/previewers/mod.ts";
+import { isNSFWSafe, sendNSFWMessageError } from "../../utils/nsfw_check.ts";
 
 export const wnacgListener: MessageListener = {
   name: "wnacg",
@@ -19,6 +20,15 @@ export const wnacgListener: MessageListener = {
   execute: async (bot, rawMessage) => {
     // deno-lint-ignore no-explicit-any
     const message = rawMessage as any;
+
+    // Strict NSFW check for automatic listener
+    const isSafe = await isNSFWSafe(bot, message.channelId, message.guildId);
+    if (!isSafe) {
+      logger.debug("WNACG listener skipped: Not in NSFW safe environment.");
+      await sendNSFWMessageError(bot, message.channelId, message.id);
+      return;
+    }
+
     const content = message.content;
 
     const preview = await getWNACGPreview(content);

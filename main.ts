@@ -19,6 +19,7 @@ const bot = createBot({
     message: {
       content: true,
       channelId: true,
+      guildId: true,
       id: true,
       author: true,
     } as const,
@@ -30,7 +31,14 @@ const bot = createBot({
       user: true,
       member: true,
       channelId: true,
+      guildId: true,
       message: true,
+    } as const,
+    channel: {
+      id: true,
+      guildId: true,
+      nsfw: true,
+      type: true,
     } as const,
   },
 });

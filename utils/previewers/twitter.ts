@@ -50,6 +50,12 @@ export async function getTwitterPreview(content: string) {
     }
 
     const tweet = data.tweet;
+    logger.debug("Twitter API Data: {id}, possibly_sensitive: {sensitive}", {
+      id: tweetId,
+      sensitive: tweet.possibly_sensitive,
+    });
+
+    const isNSFW = tweet.possibly_sensitive || false;
 
     // Build media items for gallery
     // deno-lint-ignore no-explicit-any
@@ -87,6 +93,7 @@ export async function getTwitterPreview(content: string) {
 
     return {
       color: 0x1DA1F2, // X/Twitter Blue
+      isNSFW,
       components: [
         // Author Header
         {
@@ -114,6 +121,11 @@ export async function getTwitterPreview(content: string) {
         {
           type: ComponentV2Type.TextDisplay,
           content: `[View on X](${tweet.url})`,
+        },
+        {
+          type: ComponentV2Type.TextDisplay,
+          content:
+            "-# Adult content detection is based on platform metadata. If NSFW content is incorrectly displayed in a non-NSFW channel, please delete it manually.",
         },
       ],
     };

@@ -155,13 +155,14 @@ export async function getJMComicPreview(content: string) {
       },
     ];
 
-    return { color: 0xFB7299, components };
+    return { color: 0xFB7299, components, isNSFW: true };
   } catch (error) {
     return {
       error: error instanceof Error
         ? error.message
         : "Failed to fetch 18Comic data.",
       color: 0xFF0000,
+      isNSFW: true,
     };
   }
 }
