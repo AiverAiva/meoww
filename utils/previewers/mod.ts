@@ -19,7 +19,7 @@ export const SUPPORTED_PLATFORMS = [
   "Twitter / X",
   "Pornhub (Videos & Models)",
   "Pixiv (Artworks)",
-  // "WNACG (Manga/Doujin)",
+  "WNACG (Manga/Doujin)",
   "nHentai",
   // "18Comic (JM)",
   // "Hanime1.me (Videos)",
@@ -46,13 +46,13 @@ export async function getAnyPreview(content: string) {
   const nhentai = await getNHentaiPreview(content);
   if (nhentai) return nhentai;
 
-  // Check Hanime
-  const hanime = await getHanimePreview(content);
-  if (hanime) return hanime;
+  // // Check Hanime
+  // const hanime = await getHanimePreview(content);
+  // if (hanime) return hanime;
 
-  // Check JMComic
-  const jmcomic = await getJMComicPreview(content);
-  if (jmcomic) return jmcomic;
+  // // Check JMComic
+  // const jmcomic = await getJMComicPreview(content);
+  // if (jmcomic) return jmcomic;
 
   return null;
 }

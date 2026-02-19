@@ -3,6 +3,7 @@ import { AnyBot } from "../../types.ts";
 import { logger } from "../../utils/logger.ts";
 import { handleNHentaiView } from "./nhentai.ts";
 import { handleJMComicView } from "./jmcomic.ts";
+import { handleWNACGView } from "./wnacg.ts";
 
 /**
  * Handles generic ID-based preview interactions.
@@ -29,6 +30,9 @@ export async function handleIdPreview(
       break;
     case "jmcomic":
       await handleJMComicView(bot, interaction);
+      break;
+    case "wnacg":
+      await handleWNACGView(bot, interaction);
       break;
     default:
       await bot.helpers.sendInteractionResponse(

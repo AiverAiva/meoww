@@ -75,6 +75,12 @@ export function createSourceSelectionCard(id: string) {
             label: "nHentai",
             custom_id: `id_preview:nhentai:${id}`,
           },
+          {
+            type: ComponentV2Type.Button,
+            style: 1, // Primary
+            label: "WNACG",
+            custom_id: `id_preview:wnacg:${id}`,
+          },
           // {
           //   type: ComponentV2Type.Button,
           //   style: 1, // Primary

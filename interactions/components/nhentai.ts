@@ -62,11 +62,6 @@ export async function handleNHentaiView(
 
   try {
     const components = formatPreviewComponents(data);
-
-    // Only inject 'Share Public' for the initial Quick Preview card.
-    // We skip 'isInitial' (View in Discord) because the viewer already has 5 buttons.
-    // Injecting share button is no longer needed as we're not using ephemeral
-
     await bot.helpers.sendInteractionResponse(
       interaction.id,
       interaction.token,
