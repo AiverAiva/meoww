@@ -38,6 +38,14 @@ export async function initLavalink(bot: AnyBot) {
       username: "Meoww",
     },
     userId: bot.id.toString(),
+    playerOptions: {
+      onEmptyQueue: {
+        destroyAfterMs: 60000,
+      },
+      onDisconnect: {
+        destroyPlayer: true,
+      },
+    },
   });
 
   // deno-lint-ignore no-explicit-any
@@ -64,9 +72,81 @@ export async function initLavalink(bot: AnyBot) {
     });
   });
 
-  // Player events on Manager
+  // deno-lint-ignore no-explicit-any
+  lavalink.on("queueEnd", (player: any) => {
+    logger.info("Queue ended in {guildId}", {
+      guildId: player.guildId,
+    });
+    // The playerOptions.onEmptyQueue.destroyAfterMs handles this automatically.
+  });
+
+  // Track people joining/leaving to handle "alone" state
+  const aloneTimers = new Map<string, number>();
+
+  // deno-lint-ignore no-explicit-any
+  lavalink.on("playerVoiceLeave", async (player: any, userId: any) => {
+    logger.debug("User {userId} left voice in {guildId}", { userId, guildId: player.guildId });
+    
+    // Check if bot is alone
+    // Note: lavalink-client v2 version of "alone" detection
+    // We can use the bot gateway to check channel members or 
+    // simply trust the player's internal state if it has it.
+    // In Discordeno, we might need to fetch the guild to be sure.
+    
+    try {
+      const guild = await bot.helpers.getGuild(BigInt(player.guildId));
+      const voiceStates = guild.voiceStates; // Map<userId, VoiceState>
+      
+      const membersInChannel = Array.from(voiceStates.values()).filter(
+        (vs) => vs.channelId?.toString() === player.voiceChannelId
+      );
+
+      // If only the bot (or no one) is left
+      // Sometimes the bot isn't in voiceStates if it's not cached, but we check length
+      // Bots usually count as 1. If length <= 1, it means only bot or no one.
+      if (membersInChannel.length <= 1) {
+        logger.info("Bot is alone in {channelId}. Starting 60s timeout.", { 
+          channelId: player.voiceChannelId 
+        });
+        
+        const timer = setTimeout(async () => {
+          const p = lavalink.getPlayer(player.guildId);
+          if (p && p.connected) {
+            await p.destroy();
+            logger.info("Bot left {channelId} due to being alone.", { 
+              channelId: player.voiceChannelId 
+            });
+          }
+          aloneTimers.delete(player.guildId);
+        }, 60000);
+        
+        aloneTimers.set(player.guildId, timer);
+      }
+    } catch (error) {
+      logger.error("Error checking alone state: {error}", { error });
+    }
+  });
+
+  // deno-lint-ignore no-explicit-any
+  lavalink.on("playerVoiceJoin", (player: any, userId: any) => {
+    const timer = aloneTimers.get(player.guildId);
+    if (timer) {
+      clearTimeout(timer);
+      aloneTimers.delete(player.guildId);
+      logger.info("User joined {channelId}. Cancelled alone timeout.", { 
+        channelId: player.voiceChannelId 
+      });
+    }
+  });
+
+  // Clear timer when a new track starts
   // deno-lint-ignore no-explicit-any
   lavalink.on("trackStart", (player: any, track: any) => {
+    const timer = aloneTimers.get(player.guildId);
+    if (timer) {
+      clearTimeout(timer);
+      aloneTimers.delete(player.guildId);
+    }
     logger.info("Track started in {guildId}: {title}", {
       guildId: player.guildId,
       title: track.info.title,
@@ -97,13 +177,6 @@ export async function initLavalink(bot: AnyBot) {
       guildId: player.guildId,
       title: track?.info?.title,
       error: error.message || error,
-    });
-  });
-
-  // deno-lint-ignore no-explicit-any
-  lavalink.on("queueEnd", (player: any) => {
-    logger.info("Queue ended in {guildId}", {
-      guildId: player.guildId,
     });
   });
 
