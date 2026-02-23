@@ -5,6 +5,7 @@ import { handleNHentaiView } from "./nhentai.ts";
 import { handleJMComicView } from "./jmcomic.ts";
 import { handleIdPreview } from "./id_preview.ts";
 import { handleShare } from "./share.ts";
+import { handleMusicSearch, handleMusicSelectTrack } from "./music.ts";
 
 /**
  * Entry point for all message component interactions.
@@ -29,5 +30,9 @@ export async function handleComponentInteraction(
     await handleIdPreview(bot, interaction);
   } else if (customId.startsWith("share_p:")) {
     await handleShare(bot, interaction);
+  } else if (customId.startsWith("music_search_source:")) {
+    await handleMusicSearch(bot, interaction);
+  } else if (customId === "music_select_track") {
+    await handleMusicSelectTrack(bot, interaction);
   }
 }

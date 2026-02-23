@@ -2,6 +2,7 @@ import "@std/dotenv/load";
 import { createBot, Intents } from "@discordeno/bot";
 import { logger } from "./utils/logger.ts";
 import { registerEvents } from "./events/mod.ts";
+import { initLavalink } from "./utils/lavalink.ts";
 
 const token = Deno.env.get("DISCORD_TOKEN");
 
@@ -14,7 +15,10 @@ if (!token) {
 
 const bot = createBot({
   token,
-  intents: Intents.Guilds | Intents.GuildMessages | Intents.MessageContent,
+  intents: Intents.Guilds |
+    Intents.GuildMessages |
+    Intents.MessageContent |
+    Intents.GuildVoiceStates,
   desiredProperties: {
     message: {
       content: true,
@@ -33,15 +37,32 @@ const bot = createBot({
       channelId: true,
       guildId: true,
       message: true,
-    } as const,
+    } as any,
     channel: {
       id: true,
       guildId: true,
-      nsfw: true,
       type: true,
+      nsfw: true,
+    } as any,
+    member: {
+      id: true,
+      nick: true,
+      roles: true,
+    } as any,
+    user: {
+      id: true,
+      username: true,
     } as const,
+    voiceState: {
+      channelId: true,
+      guildId: true,
+      userId: true,
+    } as any,
   },
 });
+
+// Initialize Lavalink
+await initLavalink(bot);
 
 // Initialize the modular event system
 registerEvents(bot);
