@@ -34,6 +34,7 @@ export function createNowPlayingUI(
   finished = false,
 ) {
   const total = track.info.length || track.info.duration || 0;
+  // If finished, force current to be exactly total
   const current = finished ? total : (player.position || 0);
   const progressBar = createProgressBar(current, total);
 
@@ -47,6 +48,7 @@ export function createNowPlayingUI(
   }
 
   const title = finished ? "✅ Finished" : "🎶 Now Playing";
+  const displayCurrent = finished ? total : current;
 
   return [
     {
@@ -56,7 +58,7 @@ export function createNowPlayingUI(
         {
           type: ComponentV2Type.TextDisplay,
           content: `### ${title}\n[**${track.info.title}**](${track.info.uri})\n\n` +
-            `\`${formatDuration(current)}\`${progressBar}\`${formatDuration(total)}\`` +
+            `\`${formatDuration(displayCurrent)}\`${progressBar}\`${formatDuration(total)}\`` +
             queueText,
         },
       ],

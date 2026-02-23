@@ -19,8 +19,8 @@ export function createProgressBar(current: number, total: number): string {
     return EMOJIS.progress_start_0 + EMOJIS.progress.repeat(8) + EMOJIS.progress_end;
   }
   
-  // Scale to 0-10
-  const progress = Math.max(0, Math.min(10, Math.floor((current / total) * 10)));
+  // Use round to be more generous near the end
+  const progress = Math.max(0, Math.min(10, Math.round((current / total) * 10)));
   
   if (progress <= 0) {
     return EMOJIS.progress_start_0 + EMOJIS.progress.repeat(8) + EMOJIS.progress_end;
@@ -40,8 +40,8 @@ export function createProgressBar(current: number, total: number): string {
   }
   
   // Middle cases (2 to 8)
-  const fills = progress - 1;
-  const empty = 8 - progress;
+  const fills = Math.max(0, progress - 1);
+  const empty = Math.max(0, 8 - progress);
   
   return (
     EMOJIS.progress_start +
