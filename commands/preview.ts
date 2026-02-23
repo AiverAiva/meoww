@@ -16,6 +16,7 @@ import {
   createNoLinksFoundCard,
   createSourceSelectionCard,
 } from "../utils/ui_factory.ts";
+import { isNSFWSafe, sendNSFWError } from "../utils/nsfw_check.ts";
 
 export const previewCommand: Command = {
   name: "Preview Link",
@@ -31,6 +32,16 @@ export const previewCommand: Command = {
     DiscordInteractionContextType.PrivateChannel,
   ],
   execute: async (bot, interaction) => {
+    // Strict NSFW check
+    const isSafe = await isNSFWSafe(
+      bot,
+      interaction.channelId!,
+      interaction.guildId,
+    );
+    if (!isSafe) {
+      return await sendNSFWError(bot, interaction);
+    }
+
     // Get the message content from the interaction data
     const message = interaction.data?.resolved?.messages?.values().next().value;
     const content = message?.content || "";
