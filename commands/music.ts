@@ -4,12 +4,12 @@ import {
   InteractionResponseTypes,
 } from "@discordeno/bot";
 import { Command } from "../types.ts";
-import { lavalink } from "../utils/lavalink.ts";
+import { lavalink, npMessages } from "../utils/lavalink.ts";
 import { logger } from "../utils/logger.ts";
 import { ComponentV2Type, IS_COMPONENTS_V2 } from "../utils/components_v2.ts";
 import { createErrorCard, UI_COLORS } from "../utils/ui_factory.ts";
 
-import { createMusicSearchUI } from "../utils/music_ui.ts";
+import { createMusicSearchUI, createNowPlayingUI } from "../utils/music_ui.ts";
 
 export const musicCommand: Command = {
   name: "music",
@@ -163,22 +163,18 @@ export const musicCommand: Command = {
             await player.play();
           }
 
+          // Save for real-time updates
+          npMessages.set(guildId.toString(), {
+            token: interaction.token,
+            channelId: interaction.channelId.toString(),
+          });
+
           return await bot.helpers.editOriginalInteractionResponse(
             interaction.token,
             {
               flags: IS_COMPONENTS_V2,
               // deno-lint-ignore no-explicit-any
-              components: [{
-                type: ComponentV2Type.Container,
-                accent_color: UI_COLORS.SUCCESS,
-                components: [
-                  {
-                    type: ComponentV2Type.TextDisplay,
-                    content:
-                      `🎶 Playing now: **${track.info.title}**\nChannel: <#${channelId}>`,
-                  },
-                ],
-              }] as any,
+              components: createNowPlayingUI(player, track) as any,
             },
           );
         } else {

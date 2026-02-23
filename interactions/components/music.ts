@@ -7,7 +7,8 @@ import {
   IS_COMPONENTS_V2,
 } from "../../utils/components_v2.ts";
 import { createErrorCard, UI_COLORS } from "../../utils/ui_factory.ts";
-import { createMusicSearchUI } from "../../utils/music_ui.ts";
+import { createMusicSearchUI, createNowPlayingUI } from "../../utils/music_ui.ts";
+import { npMessages } from "../../utils/lavalink.ts";
 
 export async function handleMusicSearch(
   bot: AnyBot,
@@ -164,21 +165,15 @@ export async function handleMusicSelectTrack(
       await player.play();
     }
 
+    // Save for real-time updates
+    npMessages.set(guildId.toString(), {
+      token: interaction.token,
+      channelId: interaction.channelId.toString(),
+    });
+
     await bot.helpers.editOriginalInteractionResponse(interaction.token, {
       flags: IS_COMPONENTS_V2,
-      components: [
-        {
-          type: ComponentV2Type.Container,
-          accent_color: UI_COLORS.SUCCESS,
-          components: [
-            {
-              type: ComponentV2Type.TextDisplay,
-              content:
-                `🎶 Playing now: **${track.info.title}**\nChannel: <#${vs.channelId}>`,
-            },
-          ],
-        },
-      ],
+      components: createNowPlayingUI(player, track) as any,
     });
   } catch (error) {
     logger.error("Track selection error: {error}", { error });

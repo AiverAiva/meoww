@@ -1,8 +1,13 @@
 import { LavalinkManager } from "lavalink-client";
 import { AnyBot } from "../types.ts";
 import { logger } from "./logger.ts";
+import { createNowPlayingUI } from "./music_ui.ts";
+import { IS_COMPONENTS_V2 } from "./components_v2.ts";
 
 export let lavalink: LavalinkManager;
+
+// Track "Now Playing" messages for each guild
+export const npMessages = new Map<string, { token: string; channelId: string }>();
 
 export async function initLavalink(bot: AnyBot) {
   const urlStr = (Deno.env.get("LAVALINK_HOST") || "http://localhost:2333")
@@ -139,6 +144,45 @@ export async function initLavalink(bot: AnyBot) {
     }
   });
 
+  // Helper to update NP message
+  const updateNP = async (player: any) => {
+    const info = npMessages.get(player.guildId);
+    if (!info || !player.queue.current) return;
+
+    logger.debug("Updating NP for {guildId}. Track info keys: {keys}", {
+      guildId: player.guildId,
+      keys: Object.keys(player.queue.current.info || {}),
+    });
+
+    try {
+      await bot.helpers.editOriginalInteractionResponse(info.token, {
+        flags: IS_COMPONENTS_V2,
+        components: createNowPlayingUI(player, player.queue.current) as any,
+      });
+    } catch (error) {
+      logger.debug("Failed to update NP message for {guildId}: {error}", {
+        guildId: player.guildId,
+        error: (error as Error).message,
+      });
+      // If we can't update (e.g. token expired), remove it
+      if ((error as Error).message?.includes("Unknown interaction")) {
+        npMessages.delete(player.guildId);
+      }
+    }
+  };
+
+  // periodic update (every 10s approximately)
+  const lastUpdate = new Map<string, number>();
+  // deno-lint-ignore no-explicit-any
+  lavalink.on("playerUpdate", (player: any) => {
+    const now = Date.now();
+    const last = lastUpdate.get(player.guildId) || 0;
+    if (now - last > 10000) {
+      lastUpdate.set(player.guildId, now);
+      updateNP(player);
+    }
+  });
+
   // Clear timer when a new track starts
   // deno-lint-ignore no-explicit-any
   lavalink.on("trackStart", (player: any, track: any) => {
@@ -151,6 +195,9 @@ export async function initLavalink(bot: AnyBot) {
       guildId: player.guildId,
       title: track.info.title,
     });
+    
+    // Initial update when track starts
+    updateNP(player);
   });
 
   // deno-lint-ignore no-explicit-any
@@ -160,15 +207,7 @@ export async function initLavalink(bot: AnyBot) {
       title: track?.info?.title,
       reason,
     });
-  });
-
-  // deno-lint-ignore no-explicit-any
-  lavalink.on("trackStuck", (player: any, track: any, threshold: any) => {
-    logger.warn("Track stuck in {guildId}: {title}. Threshold: {threshold}", {
-      guildId: player.guildId,
-      title: track?.info?.title,
-      threshold,
-    });
+    // Can't update NP if track ended
   });
 
   // deno-lint-ignore no-explicit-any
@@ -178,6 +217,7 @@ export async function initLavalink(bot: AnyBot) {
       title: track?.info?.title,
       error: error.message || error,
     });
+    // Maybe update NP to show error
   });
 
   logger.info("Initializing Lavalink manager...");

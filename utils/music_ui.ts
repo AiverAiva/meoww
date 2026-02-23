@@ -1,17 +1,63 @@
 import { ComponentV2Type } from "./components_v2.ts";
 import { UI_COLORS } from "./ui_factory.ts";
+import { createProgressBar } from "./emoji_factory.ts";
 
-function formatDuration(ms: number) {
-  if (!ms || ms < 0) return "Unknown";
-  if (ms >= 9223372036854775807) return "Live"; // Long.MAX_VALUE in Lavalink
+export function formatDuration(ms: number) {
+  if (!ms || ms < 0) return "00:00";
+  if (ms >= 9223372036854775807) return "Live";
   try {
-    const date = new Date(ms);
-    return date.getUTCHours() > 0
-      ? date.toISOString().substr(11, 8)
-      : date.toISOString().substr(14, 5);
+    const totalSeconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    const hours = Math.floor(minutes / 60);
+    const remainingMinutes = minutes % 60;
+
+    if (hours > 0) {
+      return `${hours.toString().padStart(2, "0")}:${
+        remainingMinutes.toString().padStart(2, "0")
+      }:${seconds.toString().padStart(2, "0")}`;
+    }
+    return `${remainingMinutes.toString().padStart(2, "0")}:${
+      seconds.toString().padStart(2, "0")
+    }`;
   } catch {
-    return "Unknown";
+    return "00:00";
   }
+}
+
+export function createNowPlayingUI(
+  // deno-lint-ignore no-explicit-any
+  player: any,
+  // deno-lint-ignore no-explicit-any
+  track: any,
+) {
+  const current = player.position || 0;
+  const total = track.info.length || track.info.duration || 0;
+  const progressBar = createProgressBar(current, total);
+
+  // Queue info
+  const queueCount = player.queue.tracks.length;
+  const nextTracks = player.queue.tracks.slice(0, 3);
+  let queueText = "";
+  if (nextTracks.length > 0) {
+    queueText = `\n\n**💭 Next (${queueCount} left)**\n` +
+      nextTracks.map((t: any) => `- [${t.info.title}](${t.info.uri}) \`${formatDuration(t.info.length)}\``).join("\n");
+  }
+
+  return [
+    {
+      type: ComponentV2Type.Container,
+      accent_color: UI_COLORS.SUCCESS,
+      components: [
+        {
+          type: ComponentV2Type.TextDisplay,
+          content: `### 🎶 Now Playing\n[**${track.info.title}**](${track.info.uri})\n\n` +
+            `\`${formatDuration(current)}\`${progressBar}\`${formatDuration(total)}\`` +
+            queueText,
+        },
+      ],
+    },
+  ];
 }
 
 export function createMusicSearchUI(
@@ -34,7 +80,7 @@ export function createMusicSearchUI(
     return {
       label: `${i + 1}. ${t.info.title}`.substring(0, 100),
       value: val,
-      description: `${t.info.author} (${formatDuration(t.info.length)})`
+      description: `${t.info.author} (${formatDuration(t.info.length || t.info.duration)})`
         .substring(0, 100),
     };
   });
