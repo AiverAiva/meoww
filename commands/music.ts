@@ -271,7 +271,7 @@ export const musicCommand: Command = {
       if (!isLastSong) {
         await player.skip();
       } else {
-        await player.stop();
+        await player.destroy();
       }
 
       return await bot.helpers.sendInteractionResponse(
