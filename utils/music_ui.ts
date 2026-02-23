@@ -89,9 +89,14 @@ export function createMusicSearchUI(
                   default: source === "spsearch",
                 },
                 {
-                  label: "SoundCloud",
-                  value: "scsearch",
-                  default: source === "scsearch",
+                  label: "Apple Music",
+                  value: "amsearch",
+                  default: source === "amsearch",
+                },
+                {
+                  label: "Deezer",
+                  value: "dzsearch",
+                  default: source === "dzsearch",
                 },
               ],
             },

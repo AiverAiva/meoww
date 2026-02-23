@@ -66,12 +66,24 @@ export async function handleMusicSearch(
         errorMessage,
       ) as any,
     });
-  } catch (error) {
+  } catch (error: any) {
     logger.error("Music search error: {error}", { error });
+
+    let readableError = "An unexpected error occurred.";
+    if (error instanceof SyntaxError) {
+      readableError = `The ${source} search returned an invalid response (Node instability).`;
+    } else if (error.name === "TimeoutError" || error.message?.includes("timed out")) {
+      readableError = `The ${source} search timed out (Upstream API slow/down).`;
+    } else if (error.message) {
+      readableError = error.message;
+    }
+
     await bot.helpers.editOriginalInteractionResponse(interaction.token, {
       flags: IS_COMPONENTS_V2,
       // deno-lint-ignore no-explicit-any
-      components: [createErrorCard("Error occurred while searching.")] as any,
+      components: [
+        createErrorCard(`### ❌ Search Failed: ${source.toUpperCase()}\n${readableError}`),
+      ] as any,
     });
   }
 }
