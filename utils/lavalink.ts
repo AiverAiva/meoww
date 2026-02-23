@@ -145,9 +145,9 @@ export async function initLavalink(bot: AnyBot) {
   });
 
   // Helper to update NP message
-  const updateNP = async (player: any, finished = false) => {
+  const updateNP = async (player: any, finished = false, fallbackTrack?: any) => {
     const info = npMessages.get(player.guildId);
-    const track = player.queue.current || player.queue.previous?.[0]; // Fallback to previous if ended
+    const track = fallbackTrack || player.queue.current || player.queue.previous?.[0];
     if (!info || !track) return;
 
     try {
@@ -203,7 +203,7 @@ export async function initLavalink(bot: AnyBot) {
       reason,
     });
     // Final update to show 100%
-    updateNP(player, true);
+    updateNP(player, true, track);
   });
 
   // deno-lint-ignore no-explicit-any

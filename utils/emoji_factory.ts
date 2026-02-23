@@ -16,44 +16,32 @@ export const EMOJIS = {
  */
 export function createProgressBar(current: number, total: number): string {
   if (total <= 0) {
-    return (
-      EMOJIS.progress_start_0 +
-      EMOJIS.progress.repeat(8) +
-      EMOJIS.progress_end
-    );
+    return EMOJIS.progress_start_0 + EMOJIS.progress.repeat(8) + EMOJIS.progress_end;
   }
   
-  // Calculate progress on a scale of 0 to 10
+  // Scale to 0-10
   const progress = Math.max(0, Math.min(10, Math.floor((current / total) * 10)));
   
   if (progress <= 0) {
-    return (
-      EMOJIS.progress_start_0 +
-      EMOJIS.progress.repeat(8) +
-      EMOJIS.progress_end
-    );
-  }
-  
-  if (progress === 1) {
-    return (
-      EMOJIS.progress_start +
-      EMOJIS.progress_mix +
-      EMOJIS.progress.repeat(7) +
-      EMOJIS.progress_end
-    );
+    return EMOJIS.progress_start_0 + EMOJIS.progress.repeat(8) + EMOJIS.progress_end;
   }
   
   if (progress >= 10) {
-    return (
-      EMOJIS.progress_start +
-      EMOJIS.progress_fill.repeat(8) +
-      EMOJIS.progress_fill_end
-    );
+    return EMOJIS.progress_start + EMOJIS.progress_fill.repeat(8) + EMOJIS.progress_fill_end;
+  }
+
+  if (progress === 1) {
+    return EMOJIS.progress_start + EMOJIS.progress_mix + EMOJIS.progress.repeat(7) + EMOJIS.progress_end;
+  }
+
+  // Handle 9 specifically to keep 10 blocks
+  if (progress === 9) {
+     return EMOJIS.progress_start + EMOJIS.progress_fill.repeat(8) + EMOJIS.progress_end;
   }
   
-  // Middle cases (2 to 9)
+  // Middle cases (2 to 8)
   const fills = progress - 1;
-  const empty = Math.max(0, 8 - progress);
+  const empty = 8 - progress;
   
   return (
     EMOJIS.progress_start +
