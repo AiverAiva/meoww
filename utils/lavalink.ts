@@ -145,26 +145,21 @@ export async function initLavalink(bot: AnyBot) {
   });
 
   // Helper to update NP message
-  const updateNP = async (player: any) => {
+  const updateNP = async (player: any, finished = false) => {
     const info = npMessages.get(player.guildId);
-    if (!info || !player.queue.current) return;
-
-    logger.debug("Updating NP for {guildId}. Track info keys: {keys}", {
-      guildId: player.guildId,
-      keys: Object.keys(player.queue.current.info || {}),
-    });
+    const track = player.queue.current || player.queue.previous?.[0]; // Fallback to previous if ended
+    if (!info || !track) return;
 
     try {
       await bot.helpers.editOriginalInteractionResponse(info.token, {
         flags: IS_COMPONENTS_V2,
-        components: createNowPlayingUI(player, player.queue.current) as any,
+        components: createNowPlayingUI(player, track, finished) as any,
       });
     } catch (error) {
       logger.debug("Failed to update NP message for {guildId}: {error}", {
         guildId: player.guildId,
         error: (error as Error).message,
       });
-      // If we can't update (e.g. token expired), remove it
       if ((error as Error).message?.includes("Unknown interaction")) {
         npMessages.delete(player.guildId);
       }
@@ -207,7 +202,8 @@ export async function initLavalink(bot: AnyBot) {
       title: track?.info?.title,
       reason,
     });
-    // Can't update NP if track ended
+    // Final update to show 100%
+    updateNP(player, true);
   });
 
   // deno-lint-ignore no-explicit-any

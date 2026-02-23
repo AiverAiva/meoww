@@ -29,10 +29,12 @@ export function createNowPlayingUI(
   // deno-lint-ignore no-explicit-any
   player: any,
   // deno-lint-ignore no-explicit-any
+  // deno-lint-ignore no-explicit-any
   track: any,
+  finished = false,
 ) {
-  const current = player.position || 0;
   const total = track.info.length || track.info.duration || 0;
+  const current = finished ? total : (player.position || 0);
   const progressBar = createProgressBar(current, total);
 
   // Queue info
@@ -41,17 +43,19 @@ export function createNowPlayingUI(
   let queueText = "";
   if (nextTracks.length > 0) {
     queueText = `\n\n**💭 Next (${queueCount} left)**\n` +
-      nextTracks.map((t: any) => `- [${t.info.title}](${t.info.uri}) \`${formatDuration(t.info.length)}\``).join("\n");
+      nextTracks.map((t: any) => `- [${t.info.title}](${t.info.uri}) \`${formatDuration(t.info.length || t.info.duration)}\``).join("\n");
   }
+
+  const title = finished ? "✅ Finished" : "🎶 Now Playing";
 
   return [
     {
       type: ComponentV2Type.Container,
-      accent_color: UI_COLORS.SUCCESS,
+      accent_color: finished ? UI_COLORS.INFO : UI_COLORS.SUCCESS,
       components: [
         {
           type: ComponentV2Type.TextDisplay,
-          content: `### 🎶 Now Playing\n[**${track.info.title}**](${track.info.uri})\n\n` +
+          content: `### ${title}\n[**${track.info.title}**](${track.info.uri})\n\n` +
             `\`${formatDuration(current)}\`${progressBar}\`${formatDuration(total)}\`` +
             queueText,
         },

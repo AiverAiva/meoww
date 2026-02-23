@@ -52,11 +52,14 @@ export function createProgressBar(current: number, total: number): string {
   }
   
   // Middle cases (2 to 9)
+  const fills = progress - 1;
+  const empty = Math.max(0, 8 - progress);
+  
   return (
     EMOJIS.progress_start +
-    EMOJIS.progress_fill.repeat(progress - 1) +
+    EMOJIS.progress_fill.repeat(fills) +
     EMOJIS.progress_mix +
-    EMOJIS.progress.repeat(8 - progress) +
+    EMOJIS.progress.repeat(empty) +
     EMOJIS.progress_end
   );
 }
