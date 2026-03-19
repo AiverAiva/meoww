@@ -2,10 +2,19 @@ import { Command } from "./mod.ts";
 import { pingCommand } from "./ping.ts";
 import { previewCommand } from "./preview.ts";
 import { musicCommand } from "./music.ts";
+import { patpatCommand, patpatUserCommand, patpatMessageCommand } from "./patpat.ts";
 
 export const commands = new Map<string, Command>();
 
 // Register commands
-commands.set(pingCommand.name, pingCommand);
-commands.set(previewCommand.name, previewCommand);
-commands.set(musicCommand.name, musicCommand);
+[
+  pingCommand,
+  previewCommand,
+  musicCommand,
+  patpatCommand,
+  patpatUserCommand,
+  patpatMessageCommand,
+].forEach(cmd => {
+  const type = cmd.type ?? 1; // Default to Slash Command (ChatInput)
+  commands.set(`${cmd.name}:${type}`, cmd);
+});

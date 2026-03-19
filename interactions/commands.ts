@@ -10,7 +10,8 @@ import { isNSFWSafe, sendNSFWError } from "../utils/nsfw_check.ts";
 export async function handleCommandInteraction(bot: AnyBot, interaction: any) {
   if (!interaction.data?.name) return;
 
-  const command = commands.get(interaction.data.name);
+  const type = interaction.data.type ?? 1;
+  const command = commands.get(`${interaction.data.name}:${type}`);
   if (command) {
     // Perform NSFW safety check only if the command is marked as NSFW.
     if (command.nsfw) {

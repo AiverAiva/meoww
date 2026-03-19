@@ -52,6 +52,8 @@ const bot = createBot({
     user: {
       id: true,
       username: true,
+      discriminator: true,
+      avatar: true,
     } as const,
     voiceState: {
       channelId: true,
