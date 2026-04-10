@@ -4,10 +4,20 @@ import { createPageJumpOptions } from "../ui_factory.ts";
 
 export const NHENTAI_REGEX = /https?:\/\/(?:www\.)?nhentai\.net\/g\/(\d+)\/?/;
 
-interface NHentaiImages {
-  pages: { t: "j" | "p" | "g" | "w"; w: number; h: number }[];
-  cover: { t: "j" | "p" | "g" | "w"; w: number; h: number };
-  thumbnail: { t: "j" | "p" | "g" | "w"; w: number; h: number };
+interface NHentaiPage {
+  number: number;
+  path: string;
+  width: number;
+  height: number;
+  thumbnail: string;
+  thumbnail_width: number;
+  thumbnail_height: number;
+}
+
+interface NHentaiCover {
+  path: string;
+  width: number;
+  height: number;
 }
 
 interface NHentaiTag {
@@ -25,9 +35,12 @@ interface NHentaiGallery {
     japanese: string;
     pretty: string;
   };
-  images: NHentaiImages;
+  cover: NHentaiCover;
+  thumbnail: NHentaiCover;
   tags: NHentaiTag[];
   num_pages: number;
+  num_favorites: number;
+  pages: NHentaiPage[];
 }
 
 const USER_AGENT =
@@ -44,7 +57,7 @@ const EXT_MAP: Record<string, string> = {
  * Fetches nhentai gallery data via API.
  */
 async function fetchNHentaiGallery(id: string): Promise<NHentaiGallery> {
-  const url = `https://nhentai.net/api/gallery/${id}`;
+  const url = `https://nhentai.net/api/v2/galleries/${id}`;
   try {
     const res = await fetch(url, { headers: { "User-Agent": USER_AGENT } });
     if (res.status === 404) {
@@ -90,11 +103,8 @@ export async function getNHentaiPreview(content: string) {
 
   try {
     const gallery = await fetchNHentaiGallery(id);
-    const mediaId = gallery.media_id;
-    // Cover usually uses thumb server
-    const coverUrl = `https://t1.nhentai.net/galleries/${mediaId}/cover.${
-      EXT_MAP[gallery.images.cover.t] || "jpg"
-    }`;
+    // Path already includes full structure like "galleries/3873751/cover.webp.webp"
+    const coverUrl = `https://t1.nhentai.net/${gallery.cover.path}`;
 
     const tags = gallery.tags
       .filter((t) => t.type === "tag")
@@ -150,8 +160,9 @@ export async function getNHentaiFullViewer(id: string, page: number) {
     const pageCount = gallery.num_pages;
     const clampedPage = Math.max(1, Math.min(page, pageCount));
 
-    const pageImage = gallery.images.pages[clampedPage - 1];
-    const imageUrl = getImageUrl(gallery.media_id, clampedPage, pageImage.t);
+    const pageImage = gallery.pages[clampedPage - 1];
+    // Path already includes full structure like "galleries/3873751/1.webp"
+    const imageUrl = `https://i1.nhentai.net/${pageImage.path}`;
 
     // deno-lint-ignore no-explicit-any
     const components: any[] = [
