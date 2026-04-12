@@ -1,0 +1,127 @@
+---
+import en from '../i18n/locales/en.json';
+import zhTW from '../i18n/locales/zh-TW.json';
+
+const currentLang = Astro.url.pathname.startsWith('/zh-TW') ? 'zh-TW' : 'en';
+const t = currentLang === 'zh-TW' ? zhTW : en;
+---
+
+<section class="features">
+  <div class="features-container">
+    <h2 class="features-title">{t.features.title}</h2>
+    
+    <div class="features-grid">
+      <!-- Link Previews -->
+      <div class="feature-card glass-card">
+        <div class="feature-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="10" width="36" height="28" rx="4" stroke="var(--color-accent)" stroke-width="2.5"/>
+            <path d="M16 24L22 18L28 24" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M28 24L34 18" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M16 24L10 18" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M16 24L22 30L28 24" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M28 24L34 30" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">{t.features.linkPreviews.title}</h3>
+        <p class="feature-description">{t.features.linkPreviews.description}</p>
+      </div>
+
+      <!-- Music Playback -->
+      <div class="feature-card glass-card">
+        <div class="feature-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="24" cy="24" r="18" stroke="var(--color-accent)" stroke-width="2.5"/>
+            <circle cx="24" cy="24" r="6" fill="var(--color-accent)"/>
+            <path d="M24 6V12" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M24 36V42" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M6 24H12" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M36 24H42" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">{t.features.music.title}</h3>
+        <p class="feature-description">{t.features.music.description}</p>
+      </div>
+
+      <!-- Fun Interactions -->
+      <div class="feature-card glass-card">
+        <div class="feature-icon">
+          <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M24 44C35.046 44 44 35.046 44 24C44 12.954 35.046 4 24 4C12.954 4 4 12.954 4 24C4 35.046 12.954 44 24 44Z" stroke="var(--color-accent)" stroke-width="2.5"/>
+            <path d="M28 20C28 20 30 24 34 24C34 24 32 28 28 28C28 28 26 32 22 32C18 32 16 28 16 28C16 28 14 24 18 24C18 24 20 20 24 20" stroke="var(--color-accent)" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="18" cy="18" r="2" fill="var(--color-accent)"/>
+            <circle cx="30" cy="18" r="2" fill="var(--color-accent)"/>
+          </svg>
+        </div>
+        <h3 class="feature-title">{t.features.interactions.title}</h3>
+        <p class="feature-description">{t.features.interactions.description}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .features {
+    padding: var(--space-20) var(--space-6);
+    background: var(--color-bg-secondary);
+  }
+
+  .features-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .features-title {
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    color: var(--color-text-primary);
+    text-align: center;
+    margin-bottom: var(--space-12);
+    position: relative;
+  }
+
+  .features-title::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: var(--color-accent);
+    border-radius: var(--radius-full);
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--space-6);
+  }
+
+  .feature-card {
+    padding: var(--space-8);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .feature-icon {
+    margin-bottom: var(--space-4);
+  }
+
+  .feature-title {
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--color-accent);
+    margin-bottom: var(--space-3);
+  }
+
+  .feature-description {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+  }
+</style>

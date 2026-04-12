@@ -1,0 +1,102 @@
+---
+const DISCORD_OAUTH = 'https://discord.com/oauth2/authorize?client_id=506843065424543745';
+
+const currentLang = Astro.url.pathname.startsWith('/zh-TW') ? 'zh-TW' : 'en';
+const otherLang = currentLang === 'en' ? 'zh-TW' : 'en';
+const otherLangUrl = otherLang === 'en' ? '/en' : '/zh-TW';
+const otherLangFlag = otherLang === 'en' ? '🇺🇸' : '🇹🇼';
+---
+
+<header class="header">
+  <div class="header-container">
+    <a href={currentLang === 'en' ? '/en' : '/zh-TW'} class="logo">
+      <span class="logo-text">Meoww</span>
+    </a>
+    
+    <nav class="nav">
+      <a href={otherLangUrl} class="lang-switch" title={otherLang === 'en' ? 'English' : '繁體中文'}>
+        {otherLangFlag}
+      </a>
+      <a href={DISCORD_OAUTH} target="_blank" rel="noopener noreferrer" class="nav-link invite-btn">
+        Add to Discord
+      </a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--color-bg-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-4) var(--space-6);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--text-xl);
+  }
+
+  .logo:hover {
+    color: var(--color-text-primary);
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  .nav-link {
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    font-size: var(--text-sm);
+    font-weight: 500;
+    transition: color 0.2s ease;
+  }
+
+  .nav-link:hover {
+    color: var(--color-text-primary);
+  }
+
+  .lang-switch {
+    font-size: var(--text-xl);
+    text-decoration: none;
+    transition: transform 0.2s ease;
+  }
+
+  .lang-switch:hover {
+    transform: scale(1.1);
+  }
+
+  .invite-btn {
+    background: var(--color-accent);
+    color: white !important;
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-full);
+    font-weight: 500;
+  }
+
+  .invite-btn:hover {
+    background: var(--color-accent-hover);
+    color: white !important;
+  }
+</style>

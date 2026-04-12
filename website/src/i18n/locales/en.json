@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Meoww - Your Discord Companion",
+    "description": "A cute and powerful Discord bot with link previews, music playback, and fun interactions."
+  },
+  "nav": {
+    "invite": "Add to Discord",
+    "support": "Support Server"
+  },
+  "hero": {
+    "title": "Meoww",
+    "tagline": "Your Discord Companion",
+    "description": "A modern Discord bot with smart link previews, music playback, and adorable interactions.",
+    "cta": "Invite Meoww",
+    "ctaSecondary": "Join Support Server"
+  },
+  "features": {
+    "title": "Features",
+    "linkPreviews": {
+      "title": "Smart Link Previews",
+      "description": "Preview links from Twitter, Threads, Pixiv, and more directly in Discord."
+    },
+    "music": {
+      "title": "Music Playback",
+      "description": "High quality music streaming with queue management and auto-disconnect."
+    },
+    "interactions": {
+      "title": "Fun Interactions",
+      "description": "Express yourself with animated GIFs like patpat, and more!"
+    }
+  },
+  "footer": {
+    "tagline": "Made with love for Discord communities",
+    "links": {
+      "github": "GitHub",
+      "discord": "Discord"
+    }
+  }
+}

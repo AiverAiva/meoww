@@ -1,0 +1,53 @@
+---
+interface Props {
+  title: string;
+  description: string;
+  locale?: string;
+}
+
+const { title, description, locale = 'en' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!DOCTYPE html>
+<html lang={locale} data-theme="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    
+    <!-- SEO -->
+    <title>{title}</title>
+    <link rel="canonical" href={canonicalURL} />
+    
+    <!-- i18n Hreflang -->
+    <link rel="alternate" hreflang="en" href="/en/" />
+    <link rel="alternate" hreflang="zh-TW" href="/zh-TW/" />
+    <link rel="alternate" hreflang="x-default" href="/en/" />
+    
+    <!-- OG Tags -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content="/og-image.png" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Analytics -->
+    <script defer data-domain="meoww.weikuwu.me" src="https://plausible.weikuwu.me/js/script.outbound-links.js"></script>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
+
+<style is:global>
+  @import '../styles/global.css';
+</style>

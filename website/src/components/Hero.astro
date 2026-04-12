@@ -1,0 +1,193 @@
+---
+import en from '../i18n/locales/en.json';
+import zhTW from '../i18n/locales/zh-TW.json';
+
+const DISCORD_OAUTH = 'https://discord.com/oauth2/authorize?client_id=506843065424543745';
+const SUPPORT_SERVER = 'https://discord.gg/ysXNTCqcN6';
+
+const currentLang = Astro.url.pathname.startsWith('/zh-TW') ? 'zh-TW' : 'en';
+const t = currentLang === 'zh-TW' ? zhTW : en;
+---
+
+<section class="hero">
+  <div class="hero-container">
+    <div class="hero-content">
+      <h1 class="hero-title">{t.hero.title}</h1>
+      <p class="hero-tagline">{t.hero.tagline}</p>
+      <p class="hero-description">{t.hero.description}</p>
+      <div class="hero-actions">
+        <a href={DISCORD_OAUTH} target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+          {t.hero.cta}
+        </a>
+        <a href={SUPPORT_SERVER} target="_blank" rel="noopener noreferrer" class="btn btn-secondary">
+          {t.hero.ctaSecondary}
+        </a>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <!-- No image yet - left blank -->
+    </div>
+  </div>
+  
+  <!-- Background decoration -->
+  <div class="hero-bg"></div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: calc(100vh - 80px);
+    display: flex;
+    align-items: center;
+    padding: var(--space-16) var(--space-6);
+    overflow: hidden;
+  }
+
+  .hero-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-12);
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-content {
+    animation: fadeInUp 0.8s ease-out;
+  }
+
+  .hero-title {
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: var(--space-2);
+    line-height: 1.1;
+  }
+
+  .hero-tagline {
+    font-size: var(--text-xl);
+    color: var(--color-accent);
+    font-weight: 500;
+    margin-bottom: var(--space-6);
+  }
+
+  .hero-description {
+    font-size: var(--text-lg);
+    color: var(--color-text-secondary);
+    line-height: 1.7;
+    margin-bottom: var(--space-8);
+    max-width: 480px;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-3) var(--space-6);
+    border-radius: var(--radius-full);
+    font-weight: 500;
+    font-size: var(--text-base);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .btn-primary {
+    background: var(--color-accent);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: var(--color-accent-hover);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+  }
+
+  .btn-secondary:hover {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-primary);
+  }
+
+  .hero-visual {
+    display: flex;
+    justify-content: center;
+    animation: fadeIn 1s ease-out 0.2s both;
+  }
+
+  .hero-illustration {
+    /* illustration removed */
+  }
+
+  .hero-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at 70% 50%, rgba(219, 185, 235, 0.08) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .hero-container {
+      grid-template-columns: 1fr;
+      text-align: center;
+    }
+
+    .hero-content {
+      order: 2;
+    }
+
+    .hero-visual {
+      order: 1;
+    }
+
+    .hero-description {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-actions {
+      justify-content: center;
+    }
+
+    .hero-illustration {
+      width: 200px;
+      height: 200px;
+    }
+  }
+</style>

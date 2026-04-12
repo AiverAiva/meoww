@@ -6,6 +6,29 @@ A modern Discord bot built with Deno 2 and Discordeno v21, featuring smart link 
 [![Discordeno](https://img.shields.io/badge/Discordeno-v21-7289DA?logo=discord)](https://discordeno.moderndeno.dev)
 [![License: MIT](https://img.shields.io/badge/License-MIT-F7DF1E?)](LICENSE)
 
+## 🌐 Website
+
+Landing page at [https://meoww.weikuwu.me](https://meoww.weikuwu.me) with EN and 繁體中文 support.
+
+| Route | Language |
+|-------|----------|
+| `/en/` | English |
+| `/zh-TW/` | 繁體中文 |
+
+**Tech Stack:** Astro + SSG 
+
+**Commands:**
+```bash
+cd website
+yarn install
+yarn dev      # Development server
+yarn build    # Production build
+yarn preview  # Preview production build
+```
+
+**Environment:**
+- Node.js >= 22.12.0
+
 ## ✨ Features
 
 ### 🔗 Smart Link Previews
@@ -388,11 +411,9 @@ Contributions are welcome! Feel free to submit issues and pull requests.
 
 ## 💬 Support
 
-If you have questions or need help, feel free to:
-- Open an issue on GitHub
-- Submit a pull request
-
-For bugs or feature requests, please use GitHub Issues.
+- **Website:** [https://meoww.weikuwu.me](https://meoww.weikuwu.me)
+- **Discord:** [Join Support Server](https://discord.gg/ysXNTCqcN6)
+- **GitHub:** [Open an Issue](https://github.com/AiverAiva/meoww/issues)
 
 ## 📄 License
 

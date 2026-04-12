@@ -1,0 +1,39 @@
+{
+  "meta": {
+    "title": "Meoww - 你的 Discord 夥伴",
+    "description": "一個可愛又強大的 Discord 機器人，具備智慧連結預覽、音樂播放和有趣的互動功能。"
+  },
+  "nav": {
+    "invite": "邀請至 Discord",
+    "support": "支援伺服器"
+  },
+  "hero": {
+    "title": "Meoww",
+    "tagline": "你的 Discord 夥伴",
+    "description": "現代化的 Discord 機器人，具備智慧連結預覽、音樂播放和可愛的互動功能。",
+    "cta": "邀請 Meoww",
+    "ctaSecondary": "加入支援伺服器"
+  },
+  "features": {
+    "title": "功能特色",
+    "linkPreviews": {
+      "title": "智慧連結預覽",
+      "description": "直接在 Discord 中預覽 Twitter、Threads、Pixiv 等平台的連結。"
+    },
+    "music": {
+      "title": "音樂播放",
+      "description": "高品質音樂串流，具備佇列管理和自動斷線功能。"
+    },
+    "interactions": {
+      "title": "有趣互動",
+      "description": "使用 patpat 等動畫 GIF 表達自己！"
+    }
+  },
+  "footer": {
+    "tagline": "用愛為 Discord 社群打造",
+    "links": {
+      "github": "GitHub",
+      "discord": "Discord"
+    }
+  }
+}
