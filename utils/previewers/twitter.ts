@@ -100,11 +100,11 @@ export async function getTwitterPreview(content: string) {
           type: ComponentV2Type.TextDisplay,
           content: `**${tweet.author.name}** (@${tweet.author.screen_name})`,
         },
-        // Content Text
-        {
+        // Content Text (only if non-empty)
+        ...(decodedText ? [{
           type: ComponentV2Type.TextDisplay,
           content: truncatedText,
-        },
+        }] : []),
         // Media Gallery (if any)
         ...(mediaItems.length > 0
           ? [{
