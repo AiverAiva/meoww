@@ -15,6 +15,7 @@ Preview links from popular platforms directly in Discord. Supported platforms:
 | Platform | Support Type | Auto Preview |
 |----------|-------------|--------------|
 | Twitter / X | Full | Yes |
+| Threads | Full | Yes |
 | Pornhub | Full | Yes |
 | Pixiv | Full | Yes |
 | WNACG | Full | Yes |
@@ -201,6 +202,7 @@ meoww/
 │   ├── previewers/             # Link preview fetchers
 │   │   ├── mod.ts              # Preview aggregator (getAnyPreview)
 │   │   ├── twitter.ts          # Twitter/X preview
+│   │   ├── threads.ts          # Threads preview
 │   │   ├── pornhub.ts          # Pornhub preview
 │   │   ├── pixiv.ts            # Pixiv preview
 │   │   ├── wnacg.ts            # WNACG preview
