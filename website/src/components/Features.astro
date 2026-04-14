@@ -11,8 +11,9 @@ const t = currentLang === 'zh-TW' ? zhTW : en;
     <h2 class="features-title">{t.features.title}</h2>
     
     <div class="features-grid">
-      <!-- Link Previews -->
-      <div class="feature-card glass-card">
+      <!-- Link Previews - Primary/Emphasized -->
+      <div class="feature-card feature-card-primary glass-card">
+        <div class="feature-badge">Featured</div>
         <div class="feature-icon">
           <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="6" y="10" width="36" height="28" rx="4" stroke="var(--color-accent)" stroke-width="2.5"/>
@@ -101,11 +102,41 @@ const t = currentLang === 'zh-TW' ? zhTW : en;
   .feature-card {
     padding: var(--space-8);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
   }
 
   .feature-card:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
+  }
+
+  .feature-card-primary {
+    border: 1px solid var(--color-accent);
+  }
+
+  .feature-card-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+  }
+
+  .feature-badge {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    color: var(--color-accent);
+    background: var(--color-accent-light);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .feature-icon {
