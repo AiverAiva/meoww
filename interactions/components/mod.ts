@@ -17,7 +17,7 @@ export async function handleComponentInteraction(
 
   if (!customId) return;
 
-  if (customId.startsWith("pixiv_p_")) {
+  if (customId.startsWith("pixiv_v_")) {
     await handlePixivPagination(bot, interaction);
   } else if (customId.startsWith("wnacg_v_")) {
     await handleWNACGView(bot, interaction);

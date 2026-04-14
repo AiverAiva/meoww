@@ -62,6 +62,11 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
 
     const isNSFW = info.xRestrict > 0;
     const pageCount = info.imageUrls.length;
+    logger.debug("Pixiv preview: artworkId={id}, pageCount={count}, pageIndex={index}", {
+      id: artworkId,
+      count: pageCount,
+      index: pageIndex,
+    });
     const safePageIndex = Math.max(0, Math.min(pageIndex, pageCount - 1));
     const currentImage = info.imageUrls[safePageIndex];
 

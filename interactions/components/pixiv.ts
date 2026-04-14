@@ -17,9 +17,12 @@ export async function handlePixivPagination(
   const customId = interaction.data?.customId;
   if (!customId) return;
 
+  logger.debug("Pixiv pagination interaction: {customId}", { customId });
+
   const parts = customId.split("_");
+  // Format: pixiv_v_artworkId_targetPage_currentPage_type
   const artworkId = parts[2];
-  const type = parts[3]; // f, v, n, l
+  const type = parts[5]; // f, v, n, l
 
   let pageIndex = 0;
   if (type === "f") {
@@ -27,16 +30,25 @@ export async function handlePixivPagination(
   } else if (type === "l") {
     pageIndex = 999; // Handled by clamping in getPixivPreview
   } else {
-    // For 'v' (prev) and 'n' (next), the index is in parts[4]
-    pageIndex = parseInt(parts[4], 10);
+    // For 'v' (prev) and 'n' (next), the target page is in parts[3]
+    pageIndex = parseInt(parts[3], 10);
   }
+
+  logger.debug("Pixiv pagination: artworkId={id}, type={type}, pageIndex={page}", {
+    id: artworkId,
+    type,
+    page: pageIndex,
+  });
 
   const preview = await getPixivPreview(
     `https://www.pixiv.net/artworks/${artworkId}`,
     pageIndex,
   );
 
-  if (!preview) return;
+  if (!preview) {
+    logger.warn("Pixiv preview returned null for artwork {id}", { id: artworkId });
+    return;
+  }
 
   try {
     await bot.helpers.sendInteractionResponse(
