@@ -48,14 +48,38 @@ async function fetchVideoInfo(
 
     const title = decodeHtmlEntities(jsonLd.name);
 
+    // Thumbnail extraction: try JSON-LD first, fall back to HTML parsing
+    let thumbnail = jsonLd.thumbnailUrl;
+    if (Array.isArray(thumbnail)) {
+      thumbnail = thumbnail[0];
+    }
+
+    // If still no thumbnail from JSON-LD, try to extract from HTML
+    if (!thumbnail) {
+      const htmlThumbnailMatch = text.match(
+        /<meta\s+(?:property|name)=["']og:image["']\s+content=["']([^"']+)["']/i,
+      );
+      if (htmlThumbnailMatch) {
+        thumbnail = htmlThumbnailMatch[1];
+      }
+    }
+
+    // Final fallback: try to find the main video thumbnail URL directly
+    if (!thumbnail) {
+      const videoThumbnailMatch = text.match(
+        /<video[^>]*\s+poster=["']([^"']+)["']/i,
+      );
+      if (videoThumbnailMatch) {
+        thumbnail = videoThumbnailMatch[1];
+      }
+    }
+
     return {
       info: {
         type: "video",
         title: title,
         author: jsonLd.author,
-        thumbnail: Array.isArray(jsonLd.thumbnailUrl)
-          ? jsonLd.thumbnailUrl[0]
-          : jsonLd.thumbnailUrl,
+        thumbnail: thumbnail,
         // deno-lint-ignore no-explicit-any
         views: jsonLd.interactionStatistic?.find((s: any) =>
           s.interactionType === "http://schema.org/WatchAction"
