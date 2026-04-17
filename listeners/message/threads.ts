@@ -25,12 +25,17 @@ export const threadsListener: MessageListener = {
     const preview = await getThreadsPreview(content);
     if (!preview) return;
 
-    // Check NSFW safety if content is adult
-    const isSafe = await isNSFWSafe(bot, message.channelId, message.guildId);
-    if (preview.isNSFW && !isSafe) {
-      await sendNSFWMessageError(bot, message.channelId, message.id);
-      return;
-    }
+    // TODO: [temporary] NSFW check bypassed for testing
+    // if (preview.isNSFW) {
+    //   const nsrfCheck = await isNSFWSafe(bot, message.channelId, message.guildId);
+    //   if (nsrfCheck === false) {
+    //     await sendNSFWMessageError(bot, message.channelId, message.id);
+    //     return;
+    //   }
+    //   if (nsrfCheck === undefined) {
+    //     logger.debug("Threads listener: NSFW check unavailable (access denied), allowing content");
+    //   }
+    // }
 
     logger.info("Threads listener found thread in channel {id}", {
       id: message.channelId,

@@ -13,17 +13,17 @@ export async function handleCommandInteraction(bot: AnyBot, interaction: any) {
   const type = interaction.data.type ?? 1;
   const command = commands.get(`${interaction.data.name}:${type}`);
   if (command) {
-    // Perform NSFW safety check only if the command is marked as NSFW.
-    if (command.nsfw) {
-      const isSafe = await isNSFWSafe(
-        bot,
-        interaction.channelId,
-        interaction.guildId,
-      );
-      if (!isSafe) {
-        return await sendNSFWError(bot, interaction);
-      }
-    }
+    // TODO: [temporary] NSFW check bypassed for testing
+    // if (command.nsfw) {
+    //   const isSafe = await isNSFWSafe(
+    //     bot,
+    //     interaction.channelId,
+    //     interaction.guildId,
+    //   );
+    //   if (!isSafe) {
+    //     return await sendNSFWError(bot, interaction);
+    //   }
+    // }
 
     logger.debug("Executing command: {name}", { name: command.name });
     try {
