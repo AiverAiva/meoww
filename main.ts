@@ -43,6 +43,7 @@ const bot = createBot({
       guildId: true,
       type: true,
       nsfw: true,
+      parentId: true,
     } as any,
     member: {
       id: true,

@@ -9,6 +9,7 @@ import { ComponentV2Type, IS_COMPONENTS_V2 } from "./components_v2.ts";
  * NSFW content is allowed in:
  * 1. Direct Messages (DM) - where guildId is undefined.
  * 2. Channels explicitly marked as NSFW in a Guild.
+ * 3. Threads in NSFW channels (threads inherit NSFW status from parent).
  */
 export async function isNSFWSafe(
   bot: AnyBot,
@@ -22,7 +23,37 @@ export async function isNSFWSafe(
 
   try {
     const channel = await bot.helpers.getChannel(channelId);
-    return !!channel.nsfw;
+    const channelIdStr = channelId.toString();
+    const channelNsfw = !!channel.nsfw;
+    const channelType = channel.type;
+    
+    // Get parentId from channel (only applicable for threads)
+    const parentId = (channel as any).parentId;
+    const parentIdStr = parentId?.toString();
+    
+    // Thread types: 10 = GUILD_PRIVATE_THREAD, 11 = GUILD_PUBLIC_THREAD, 12 = GUILD_NEWS_THREAD, 13 = GUILD_STAGE_THREAD
+    const isThread = Number(channelType) >= 10 && Number(channelType) <= 13 && !!parentId;
+    
+    logger.debug("NSFW check for channel {channelId}: type={type}, nsfw={nsfw}, isThread={isThread}, parentId={parentId}", {
+      channelId: channelIdStr,
+      type: channelType,
+      nsfw: channelNsfw,
+      isThread: isThread,
+      parentId: parentIdStr,
+    });
+    
+    // If the channel is a thread, check the parent channel's NSFW status
+    if (isThread) {
+      const parentChannel = await bot.helpers.getChannel(parentId);
+      const parentNsfw = !!parentChannel.nsfw;
+      logger.debug("Channel {channelId} is thread, parent {parentId} NSFW status: {nsfw}", {
+        channelId: channelIdStr,
+        parentId: parentIdStr,
+        nsfw: parentNsfw,
+      });
+      return parentNsfw;
+    }
+    return channelNsfw;
   } catch (error) {
     logger.error("Failed to fetch channel for NSFW check: {error}", { error });
     // In case of error (e.g. channel not found/no access), we default to unsafe for server channels.
