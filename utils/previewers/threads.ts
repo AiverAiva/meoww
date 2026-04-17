@@ -46,24 +46,58 @@ export async function getThreadsPreview(content: string) {
     const ogDescMatch = html.match(/<meta[^>]+property=["']og:description["'][^>]+content=["']([^"']+)["']/i) ||
       html.match(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:description["']/i);
 
+    // Helper function to decode HTML entities
+    const decodeUrlHtmlEntities = (str: string) => str
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&#x27;/g, "'")
+      .replace(/&#x2F;/g, "/");
+
     // Extract ALL og:image tags (for carousels with multiple images)
     const ogImageMatches = [...html.matchAll(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/gi)];
     const ogImageAltMatches = [...html.matchAll(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']/gi)];
     const allImages = [
-      ...ogImageMatches.map((m) => m[1]),
-      ...ogImageAltMatches.map((m) => m[1]),
+      ...ogImageMatches.map((m) => decodeUrlHtmlEntities(m[1])),
+      ...ogImageAltMatches.map((m) => decodeUrlHtmlEntities(m[1])),
     ];
 
     // Extract ALL og:video tags (for posts with videos)
     const ogVideoMatches = [...html.matchAll(/<meta[^>]+property=["']og:video["'][^>]+content=["']([^"']+)["']/gi)];
     const ogVideoAltMatches = [...html.matchAll(/<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:video["']/gi)];
     const allVideos = [
-      ...ogVideoMatches.map((m) => m[1]),
-      ...ogVideoAltMatches.map((m) => m[1]),
+      ...ogVideoMatches.map((m) => decodeUrlHtmlEntities(m[1])),
+      ...ogVideoAltMatches.map((m) => decodeUrlHtmlEntities(m[1])),
     ];
+
+    // Helper to detect if URL is likely a profile/avatar image
+    const isLikelyAvatarImage = (url: string): boolean => {
+      const lowerUrl = url.toLowerCase();
+      // Instagram CDN profile pictures often have these patterns
+      return lowerUrl.includes("s640x640") ||
+             lowerUrl.includes("s150x150") ||
+             lowerUrl.includes("profile_pic") ||
+             lowerUrl.includes("vp/") && lowerUrl.includes("s640x640");
+    };
+
+    // Helper to detect video from URL patterns
+    const isVideoUrl = (url: string): boolean => {
+      const lowerUrl = url.toLowerCase();
+      return lowerUrl.includes(".mp4") ||
+             lowerUrl.includes(".mov") ||
+             lowerUrl.includes("/videos/") ||
+             lowerUrl.includes("video");
+    };
 
     const ogTitle = ogTitleMatch ? decodeHtmlEntities(ogTitleMatch[1]) : "";
     const ogDescription = ogDescMatch ? decodeHtmlEntities(ogDescMatch[1]) : "";
+
+    // Parse author info from ogTitle (format: "DisplayName (@username) on Threads")
+    const authorMatch = ogTitle.match(/^(.+)\s+\(@([^)]+)\)\s+on\s+Threads$/);
+    const authorName = authorMatch ? authorMatch[1] : username;
+    const authorUsername = authorMatch ? authorMatch[2] : username;
 
     logger.debug("Threads OG Data: title: {title}, images: {imgCount}, videos: {vidCount}", {
       title: ogTitle,
@@ -74,8 +108,24 @@ export async function getThreadsPreview(content: string) {
     // Build media items for gallery - add ALL images and videos
     const mediaItems: { media: { url: string; thumbnail?: { url: string } }; spoiler: boolean }[] = [];
 
-    // Add all images first
-    for (const imageUrl of allImages) {
+    // Filter images: separate potential avatars from post images
+    // Use stronger heuristics to detect actual post images vs avatars/profile pics
+    const potentialAvatars = allImages.filter(isLikelyAvatarImage);
+    const potentialPostImages = allImages.filter(url => !isLikelyAvatarImage(url));
+
+    // Check if we only have avatar images (no actual post images)
+    const hasRealPostImages = potentialPostImages.length > 0;
+
+    // Log for debugging when we find only avatars
+    if (!hasRealPostImages && potentialAvatars.length > 0) {
+      logger.debug("Threads: Only avatar image(s) found in OG tags, may indicate carousel/video content not exposed via OG");
+    }
+
+    // Prefer non-avatar images if available, otherwise use whatever we have
+    const postImagesToUse = hasRealPostImages ? potentialPostImages : allImages;
+
+    // Add post images first (not avatars if we can help it)
+    for (const imageUrl of postImagesToUse) {
       mediaItems.push({
         media: {
           url: imageUrl,
@@ -109,10 +159,10 @@ export async function getThreadsPreview(content: string) {
       color: 0x000000,
       isNSFW: false,
       components: [
-        // Author Header (just username, no redundant "on Threads")
+        // Author Header with display name and username
         {
           type: ComponentV2Type.TextDisplay,
-          content: `**@${username}**`,
+          content: `**${authorName}** (@${authorUsername})`,
         },
         // Content Text (use ogDescription, skip if ogTitle is just duplicate username info)
         ...(ogDescription && ogDescription !== ogTitle
