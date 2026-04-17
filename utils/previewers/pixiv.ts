@@ -115,11 +115,11 @@ export async function getPixivPreview(content: string, pageIndex = 0) {
         type: ComponentV2Type.TextDisplay,
         content: `🏷️ ${tagBlock}`.substring(0, 1000), // Larger limit for tags
       },
-      {
-        type: ComponentV2Type.TextDisplay,
-        content:
-          "-# Adult content detection is based on platform metadata. If NSFW content is incorrectly displayed in a non-NSFW channel, please delete it manually.",
-      },
+      // {
+      //   type: ComponentV2Type.TextDisplay,
+      //   content:
+      //     "-# Adult content detection is based on platform metadata. If NSFW content is incorrectly displayed in a non-NSFW channel, please delete it manually.",
+      // },
     ];
 
     // Add Pagination Buttons if more than 1 page

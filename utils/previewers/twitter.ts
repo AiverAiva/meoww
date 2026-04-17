@@ -121,12 +121,12 @@ export async function getTwitterPreview(content: string) {
         {
           type: ComponentV2Type.TextDisplay,
           content: `[View on X](${tweet.url})`,
-        },
-        {
-          type: ComponentV2Type.TextDisplay,
-          content:
-            "-# Adult content detection is based on platform metadata. If NSFW content is incorrectly displayed in a non-NSFW channel, please delete it manually.",
-        },
+        },  
+        // {
+        //   type: ComponentV2Type.TextDisplay,
+        //   content:
+        //     "-# Adult content detection is based on platform metadata. If NSFW content is incorrectly displayed in a non-NSFW channel, please delete it manually.",
+        // },
       ],
     };
   } catch (error) {

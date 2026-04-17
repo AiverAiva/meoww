@@ -45,13 +45,14 @@ export function createNoLinksFoundCard() {
       },
       {
         type: ComponentV2Type.TextDisplay,
-        content: `**🌐 Previewable Links**\n• Twitter / X\n• Pixiv Artworks`,
+        content: `**🌐 Previewable Links**\n• Twitter / X\n• Pixiv Artworks\n• nHentai\n• WNACG (Manga/Doujin)\n• Pornhub Videos & Models`,
+        // \n• 18Comic (JM)\n• Hanime1.me (Videos)
       },
-      {
-        type: ComponentV2Type.TextDisplay,
-        content:
-          `**🔞 NSFW Limited Links**\n• Twitter / X (Adult content)\n• Pixiv Artworks (Adult content)\n• nHentai\n• WNACG (Manga/Doujin)\n• 18Comic (JM)\n• Hanime1.me (Videos)\n• Pornhub Videos & Models`,
-      },
+      // {
+      //   type: ComponentV2Type.TextDisplay,
+      //   content:
+      //     `**🔞 NSFW Limited Links**\n• Twitter / X (Adult content)\n• Pixiv Artworks (Adult content)`,
+      // },
     ],
   };
 }
