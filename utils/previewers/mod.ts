@@ -16,6 +16,7 @@ export * from "./wnacg.ts";
 export * from "./nhentai.ts";
 export * from "./hanime.ts";
 export * from "./jmcomic.ts";
+export * from "./latex.ts";
 
 export const SUPPORTED_PLATFORMS = [
   "Threads",

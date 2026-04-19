@@ -8,6 +8,7 @@ import { wnacgListener } from "./wnacg.ts";
 import { nhentaiListener } from "./nhentai.ts";
 import { hanimeListener } from "./hanime.ts";
 import { jmcomicListener } from "./jmcomic.ts";
+import { latexListener } from "./latex.ts";
 
 export const messageListeners: MessageListener[] = [
   helloListener,
@@ -17,6 +18,7 @@ export const messageListeners: MessageListener[] = [
   pixivListener,
   wnacgListener,
   nhentaiListener,
+  latexListener,
   // hanimeListener,
   // jmcomicListener,
 ];
