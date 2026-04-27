@@ -4,6 +4,7 @@ import { previewCommand } from "./preview.ts";
 import { musicCommand } from "./music.ts";
 import { patpatCommand, patpatUserCommand, patpatMessageCommand } from "./patpat.ts";
 import { latexCommand, latexMessageCommand } from "./latex.ts";
+import { paletteCommand, paletteMessageCommand } from "./palette.ts";
 
 export const commands = new Map<string, Command>();
 
@@ -17,6 +18,8 @@ export const commands = new Map<string, Command>();
   patpatMessageCommand,
   latexCommand,
   latexMessageCommand,
+  paletteCommand,
+  paletteMessageCommand,
 ].forEach(cmd => {
   const type = cmd.type ?? 1; // Default to Slash Command (ChatInput)
   commands.set(`${cmd.name}:${type}`, cmd);

@@ -3,8 +3,8 @@
     "strict": true
   },
   "tasks": {
-    "dev": "deno run --watch --allow-net --allow-env --allow-read main.ts",
-    "start": "deno run --allow-net --allow-env --allow-read main.ts"
+    "dev": "deno run --watch --allow-net --allow-env --allow-read --allow-ffi --allow-sys main.ts",
+    "start": "deno run --allow-net --allow-env --allow-read --allow-ffi --allow-sys main.ts"
   },
   "imports": {
     "@discordeno/bot": "npm:@discordeno/bot@^21.0.0",
@@ -15,6 +15,7 @@
     "@std/dotenv/load": "jsr:@std/dotenv@^0.225.6/load",
     "lavalink-client": "npm:lavalink-client@^2.2.1",
     "jimp": "npm:jimp@^1.6.0",
+    "@napi-rs/canvas": "npm:@napi-rs/canvas@^0.1",
     "@std/path": "jsr:@std/path@^1.0.0"
   }
 }
