@@ -16,6 +16,7 @@
     "lavalink-client": "npm:lavalink-client@^2.2.1",
     "jimp": "npm:jimp@^1.6.0",
     "@napi-rs/canvas": "npm:@napi-rs/canvas@^0.1",
-    "@std/path": "jsr:@std/path@^1.0.0"
+    "@std/path": "jsr:@std/path@^1.0.0",
+    "mongodb": "npm:mongodb@^6.0.0"
   }
 }

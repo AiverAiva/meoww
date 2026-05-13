@@ -5,6 +5,7 @@ import { ComponentV2Type } from "./components_v2.ts";
  */
 export const UI_COLORS = {
   ERROR: 0xFF4B4B,
+  WARNING: 0xFFA500,
   INFO: 0x3B82F6,
   SUCCESS: 0x10B981,
   TWITTER: 0x1DA1F2,

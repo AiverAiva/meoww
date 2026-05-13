@@ -5,6 +5,13 @@ import { handleNHentaiView } from "./nhentai.ts";
 import { handleJMComicView } from "./jmcomic.ts";
 import { handleIdPreview } from "./id_preview.ts";
 import { handleMusicSearch, handleMusicSelectTrack } from "./music.ts";
+import {
+  handleHoneypotBindCurrent,
+  handleHoneypotSetupNew,
+  handleHoneypotUnbind,
+  handleHoneypotDeleteChannel,
+  handleHoneypotKeepChannel,
+} from "./honeypot.ts";
 
 /**
  * Entry point for all message component interactions.
@@ -31,5 +38,15 @@ export async function handleComponentInteraction(
     await handleMusicSearch(bot, interaction);
   } else if (customId === "music_select_track") {
     await handleMusicSelectTrack(bot, interaction);
+  } else if (customId === "honeypot_bind_current") {
+    await handleHoneypotBindCurrent(bot, interaction);
+  } else if (customId === "honeypot_setup_new") {
+    await handleHoneypotSetupNew(bot, interaction);
+  } else if (customId === "honeypot_unbind") {
+    await handleHoneypotUnbind(bot, interaction);
+  } else if (customId.startsWith("honeypot_delete_ch:")) {
+    await handleHoneypotDeleteChannel(bot, interaction);
+  } else if (customId.startsWith("honeypot_keep_ch:")) {
+    await handleHoneypotKeepChannel(bot, interaction);
   }
 }

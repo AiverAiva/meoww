@@ -14,6 +14,7 @@ export interface Command {
   integrationTypes?: number[];
   contexts?: number[];
   nsfw?: boolean;
+  defaultMemberPermissions?: string[];
   /** The function to execute when the command is called. */
   // deno-lint-ignore no-explicit-any
   execute: (bot: AnyBot, interaction: any) => Promise<unknown> | unknown;

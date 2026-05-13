@@ -3,6 +3,8 @@ import { createBot, Intents } from "@discordeno/bot";
 import { logger } from "./utils/logger.ts";
 import { registerEvents } from "./events/mod.ts";
 import { initLavalink } from "./utils/lavalink.ts";
+import { getDb } from "./utils/db.ts";
+import { ensureIndexes } from "./utils/honeypot_store.ts";
 
 const token = Deno.env.get("DISCORD_TOKEN");
 
@@ -37,6 +39,7 @@ const bot = createBot({
       channelId: true,
       guildId: true,
       message: true,
+      appPermissions: true,
     } as any,
     channel: {
       id: true,
@@ -44,11 +47,17 @@ const bot = createBot({
       type: true,
       nsfw: true,
       parentId: true,
+      name: true,
+    } as any,
+    guild: {
+      id: true,
+      name: true,
     } as any,
     member: {
       id: true,
       nick: true,
       roles: true,
+      user: true,
     } as any,
     user: {
       id: true,
@@ -63,6 +72,10 @@ const bot = createBot({
     } as any,
   },
 });
+
+// Initialize MongoDB
+await getDb();
+await ensureIndexes();
 
 // Initialize Lavalink
 await initLavalink(bot);
