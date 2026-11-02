@@ -256,6 +256,8 @@ meoww/
 | `DISCORD_TOKEN` | Yes | — | Your Discord bot token |
 | `LAVALINK_HOST` | No | localhost:2333 | Lavalink server (include port like `localhost:2333`) |
 | `LAVALINK_PASSWORD` | No | youshallnotpass | Lavalink server password |
+| `STT_URL` | No | — | Full `POST /v1/audio/transcriptions` URL used by Preview Voice |
+| `STT_MODEL` | No | — | Model name Preview Voice sends with the audio |
 
 ### Discord Intents
 
@@ -280,6 +282,7 @@ meoww/
 | Command | Description |
 |---------|-------------|
 | Preview Link | Right-click any message with a link to preview it |
+| Preview Voice | Right-click a Discord voice message to transcribe it |
 
 ### User Context Menu
 

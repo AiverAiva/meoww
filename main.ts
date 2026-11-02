@@ -28,7 +28,16 @@ const bot = createBot({
       guildId: true,
       id: true,
       author: true,
+      attachments: true,
     } as const,
+    attachment: {
+      id: true,
+      filename: true,
+      contentType: true,
+      size: true,
+      url: true,
+      duration_secs: true,
+    } as any,
     interaction: {
       id: true,
       token: true,

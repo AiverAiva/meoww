@@ -1,4 +1,5 @@
 import { ComponentV2Type } from "./components_v2.ts";
+import { fitTranscriptBlock } from "./voice/transcript.ts";
 
 /**
  * Standard colors used across the application UI.
@@ -23,6 +24,20 @@ export function createErrorCard(message: string) {
       {
         type: ComponentV2Type.TextDisplay,
         content: `### ❌ Error\n${message}`,
+      },
+    ],
+  };
+}
+
+/** Public voice-transcript card. One text block, kept inside the display budget. */
+export function createVoiceTranscriptCard(text: string, meta: string) {
+  return {
+    type: ComponentV2Type.Container,
+    accent_color: UI_COLORS.INFO,
+    components: [
+      {
+        type: ComponentV2Type.TextDisplay,
+        content: fitTranscriptBlock(text, meta),
       },
     ],
   };

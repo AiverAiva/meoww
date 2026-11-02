@@ -6,6 +6,7 @@ import { patpatCommand, patpatUserCommand, patpatMessageCommand } from "./patpat
 import { latexCommand, latexMessageCommand } from "./latex.ts";
 import { paletteCommand, paletteMessageCommand } from "./palette.ts";
 import { honeypotCommand } from "./honeypot.ts";
+import { voicePreviewCommand } from "./voice_preview.ts";
 
 export const commands = new Map<string, Command>();
 
@@ -22,6 +23,7 @@ export const commands = new Map<string, Command>();
   paletteCommand,
   paletteMessageCommand,
   honeypotCommand,
+  voicePreviewCommand,
 ].forEach(cmd => {
   const type = cmd.type ?? 1; // Default to Slash Command (ChatInput)
   commands.set(`${cmd.name}:${type}`, cmd);
