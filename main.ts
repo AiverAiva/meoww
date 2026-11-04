@@ -2,7 +2,7 @@ import "@std/dotenv/load";
 import { createBot, Intents } from "@discordeno/bot";
 import { logger } from "./utils/logger.ts";
 import { registerEvents } from "./events/mod.ts";
-import { initLavalink } from "./utils/lavalink.ts";
+// import { initLavalink } from "./utils/lavalink.ts"; // Music: keep commented out while no Lavalink node is available
 import { getDb } from "./utils/db.ts";
 import { ensureIndexes } from "./utils/honeypot_store.ts";
 
@@ -87,7 +87,7 @@ await getDb();
 await ensureIndexes();
 
 // Initialize Lavalink
-await initLavalink(bot);
+// await initLavalink(bot); // Music: keep commented out while no Lavalink node is available
 
 // Initialize the modular event system
 registerEvents(bot);

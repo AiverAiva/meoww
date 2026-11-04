@@ -1,7 +1,7 @@
 import { Command } from "./mod.ts";
 import { pingCommand } from "./ping.ts";
 import { previewCommand } from "./preview.ts";
-import { musicCommand } from "./music.ts";
+// import { musicCommand } from "./music.ts"; // Music: keep commented out while no Lavalink node is available
 import { patpatCommand, patpatUserCommand, patpatMessageCommand } from "./patpat.ts";
 import { latexCommand, latexMessageCommand } from "./latex.ts";
 import { paletteCommand, paletteMessageCommand } from "./palette.ts";
@@ -14,7 +14,7 @@ export const commands = new Map<string, Command>();
 [
   pingCommand,
   previewCommand,
-  musicCommand,
+  // musicCommand, // Music: keep commented out while no Lavalink node is available
   patpatCommand,
   patpatUserCommand,
   patpatMessageCommand,
