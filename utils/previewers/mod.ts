@@ -1,6 +1,7 @@
 import { createContainer, createErrorCard } from "../ui_factory.ts";
 import { getPornhubPreview } from "./pornhub.ts";
 import { getThreadsPreview } from "./threads.ts";
+import { getShopeePreview } from "./shopee.ts";
 import { getTwitterPreview } from "./twitter.ts";
 import { getPixivPreview } from "./pixiv.ts";
 import { getWNACGPreview } from "./wnacg.ts";
@@ -9,6 +10,7 @@ import { getHanimePreview } from "./hanime.ts";
 import { getJMComicPreview } from "./jmcomic.ts";
 
 export * from "./threads.ts";
+export * from "./shopee.ts";
 export * from "./twitter.ts";
 export * from "./pornhub.ts";
 export * from "./pixiv.ts";
@@ -21,6 +23,7 @@ export * from "./palette.ts";
 
 export const SUPPORTED_PLATFORMS = [
   "Threads",
+  "Shopee (shp.ee)",
   "Twitter / X",
   "Pornhub (Videos & Models)",
   "Pixiv (Artworks)",
@@ -38,6 +41,10 @@ export async function getAnyPreview(content: string) {
   // Check Threads
   const threads = await getThreadsPreview(content);
   if (threads) return threads;
+
+  // Check Shopee short links
+  const shopee = await getShopeePreview(content);
+  if (shopee) return shopee;
 
   // Check Pornhub
   const pornhub = await getPornhubPreview(content);

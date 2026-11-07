@@ -2,6 +2,7 @@ import { MessageListener } from "../../types.ts";
 import { helloListener } from "./hello.ts";
 import { pornhubListener } from "./pornhub.ts";
 import { threadsListener } from "./threads.ts";
+import { shopeeListener } from "./shopee.ts";
 import { twitterListener } from "./twitter.ts";
 import { pixivListener } from "./pixiv.ts";
 import { wnacgListener } from "./wnacg.ts";
@@ -16,6 +17,7 @@ export const messageListeners: MessageListener[] = [
   helloListener,
   pornhubListener,
   threadsListener,
+  shopeeListener,
   twitterListener,
   pixivListener,
   wnacgListener,

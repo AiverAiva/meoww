@@ -43,6 +43,7 @@ Preview links from popular platforms directly in Discord. Supported platforms:
 | Pixiv | Full | Yes |
 | WNACG | Full | Yes |
 | nHentai | Full | Yes |
+| Shopee | shp.ee short links | Yes |
 
 ### 🎵 Music Playback
 

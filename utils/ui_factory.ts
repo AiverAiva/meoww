@@ -61,7 +61,8 @@ export function createNoLinksFoundCard() {
       },
       {
         type: ComponentV2Type.TextDisplay,
-        content: `**🌐 Previewable Links**\n• Twitter / X\n• Pixiv Artworks\n• nHentai\n• WNACG (Manga/Doujin)\n• Pornhub Videos & Models`,
+        content:
+          `**🌐 Previewable Links**\n• Twitter / X\n• Pixiv Artworks\n• nHentai\n• WNACG (Manga/Doujin)\n• Pornhub Videos & Models\n• Shopee`,
         // \n• 18Comic (JM)\n• Hanime1.me (Videos)
       },
       // {
